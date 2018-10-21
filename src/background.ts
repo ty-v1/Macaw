@@ -54,16 +54,16 @@ app.on('activate', () => {
 app.on('ready', async () => {
     if (isDevelopment && !process.env.IS_TEST) {
         // Install Vue Devtools
-        await installVueDevtools()
+        await installVueDevtools();
     }
-    createWindow()
+    createWindow();
 });
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
     process.on('message', data => {
         if (data === 'graceful-exit') {
-            app.quit()
+            app.quit();
         }
-    })
+    });
 }
