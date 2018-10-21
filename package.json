@@ -10,6 +10,10 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@types/cytoscape": "^3.2.7",
+    "@types/node": "^10.12.0",
+    "ajv": "^6.5.4",
+    "cytoscape": "^3.2.18",
     "register-service-worker": "^1.0.0",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
