@@ -1,5 +1,5 @@
-import {Patch} from "@/scripts/Cytoscape/Data/Patch";
-import {Operation} from "@/scripts/Cytoscape/Data/Operation";
+import {Patch} from './Patch';
+import {Operation} from './Operation';
 
 export type VariantDatum = {
     id: string;

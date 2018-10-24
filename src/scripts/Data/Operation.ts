@@ -1,4 +1,4 @@
-import {Patch} from "@/scripts/Cytoscape/Data/Patch";
+import {Patch} from './Patch';
 
 export type Operation = {
     id: string

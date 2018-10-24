@@ -1,5 +1,5 @@
-import {VariantDatum} from "@/scripts/Cytoscape/Data/VariantDatum";
-import {Operation} from "@/scripts/Cytoscape/Data/Operation";
+import {VariantDatum} from './VariantDatum';
+import {Operation} from './Operation';
 
 export class Variant {
 
