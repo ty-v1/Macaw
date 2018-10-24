@@ -24,6 +24,10 @@ export class Variant {
         return parentIds;
     }
 
+    public getFitness(): number {
+        return this.datum.fitness;
+    }
+
     /**
      * バリアントの比較をする
      * */
