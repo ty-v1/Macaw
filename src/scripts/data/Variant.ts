@@ -28,6 +28,10 @@ export class Variant {
         return this.datum.fitness;
     }
 
+    public getGenerationNumber(): number {
+        return this.datum.generationNumber;
+    }
+
     /**
      * バリアントの比較をする
      * */
