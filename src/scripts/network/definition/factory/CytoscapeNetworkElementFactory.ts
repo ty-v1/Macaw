@@ -9,6 +9,7 @@ export class CytoscapeNetworkElementFactory {
 
         variants.forEach((variant) => {
             const node: CytoscapeNodeDefinition = {
+                group: "nodes",
                 data: {
                     id: variant.getId(),
                     generationNumber: variant.getGenerationNumber(),
@@ -29,6 +30,7 @@ export class CytoscapeNetworkElementFactory {
 
             variant.getOperations().forEach((operation) => {
                 const edge: CytoscapeEdgeDefinition = {
+                    group: "edges",
                     data: {
                         source: operation.id,
                         target: targetId,
