@@ -7,6 +7,6 @@ export type VariantDatum = {
     fitness: number;
     buildSuccess: boolean;
     testResult: number;
-    patch: Patch[];
+    patches: Patch[];
     operations: Operation[];
 }
