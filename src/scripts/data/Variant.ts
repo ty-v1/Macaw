@@ -1,5 +1,6 @@
-import {VariantDatum} from './VariantDatum';
-import {Operation} from './Operation';
+import {Patch} from "@/scripts/data/Patch";
+import {VariantDatum} from "@/scripts/data/VariantDatum";
+import {Operation} from "@/scripts/data/Operation";
 
 export class Variant {
 
@@ -13,15 +14,12 @@ export class Variant {
         return this.datum.id;
     }
 
-    public getParentIds(): string[] {
-        const parentIds: string[] = [];
+    public getOperations(): Operation[] {
+        return this.datum.operations;
+    }
 
-        this.datum.operations.forEach(
-            (operation: Operation) => {
-                const size: number = parentIds.length;
-                parentIds[size] = operation.id;
-            });
-        return parentIds;
+    public getPatches(): Patch[] {
+        return this.datum.patches;
     }
 
     public getFitness(): number {

@@ -1,4 +1,4 @@
-import {Patch} from './Patch';
+import {Patch} from "@/scripts/data/Patch";
 
 export type Operation = {
     id: string
