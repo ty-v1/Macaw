@@ -4,8 +4,6 @@ import {NodeSingular} from "cytoscape";
 import NodeShape = cytoscape.Css.NodeShape;
 
 export class DefaultNodeShape implements INodeShapeStrategy {
-    createNodeShape(data: NodeSingular): NodeShape;
-    createNodeShape(data: Variant): NodeShape ;
     createNodeShape(data: NodeSingular | Variant): NodeShape {
         return 'ellipse';
     }

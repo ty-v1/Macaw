@@ -4,8 +4,6 @@ import {EdgeSingular} from "cytoscape";
 import LineStyle = cytoscape.Css.LineStyle;
 
 export class DefaultEdgeLine implements IEdgeLineStrategy {
-    createEdgeLine(data: EdgeSingular): LineStyle;
-    createEdgeLine(data: Variant): LineStyle;
     createEdgeLine(data: EdgeSingular | Variant): LineStyle {
         return 'solid';
     }

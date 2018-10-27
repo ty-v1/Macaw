@@ -3,8 +3,5 @@ import {NodeSingular} from "cytoscape";
 import NodeShape = cytoscape.Css.NodeShape;
 
 export interface INodeShapeStrategy {
-
-    createNodeShape(data: NodeSingular): NodeShape;
-
-    createNodeShape(data: Variant): NodeShape;
+    createNodeShape(data: NodeSingular | Variant): NodeShape;
 }

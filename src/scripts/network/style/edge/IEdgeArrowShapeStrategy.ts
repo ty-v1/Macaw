@@ -3,7 +3,5 @@ import {EdgeSingular} from "cytoscape";
 import ArrowShape = cytoscape.Css.ArrowShape;
 
 export interface IEdgeArrowShapeStrategy {
-    createEdgeArrowShape(data: EdgeSingular): ArrowShape;
-
-    createEdgeArrowShape(data: Variant): ArrowShape;
+    createEdgeArrowShape(data: EdgeSingular | Variant): ArrowShape;
 }
