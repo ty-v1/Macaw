@@ -11,8 +11,8 @@
  *
  * */
 
-module JsonFileParsed {
-    export const CHANNEL = "json-file-parsed";
+module FileRead {
+    export const CHANNEL = "file-read";
 }
 
 module FileDropped {
