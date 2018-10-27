@@ -61,24 +61,23 @@ export abstract class AbstractNetworkComponent extends Vue {
     private setVariants(variants: Variant[]): void {
         this.removeAllElements();
         this.addElements(variants);
-
-        this.applyElementStyle();
-        this.applyLayout();
     }
 
     public setNetworkLayout(networkLayout: INetworkLayoutCreator): void {
         this.networkLayoutCreator = networkLayout;
-        this.applyLayout();
+        const variants: Variant[] = this.$store.getters.getAllVariants(this.$store);
+        this.applyLayout(variants);
     }
 
     public setElementStyleFactory(elementStyleFactory: ElementStyleCreator): void {
         this.elementStyleCreator = elementStyleFactory;
-        this.applyElementStyle();
+        const variants: Variant[] = this.$store.getters.getAllVariants(this.$store);
+        this.applyElementStyle(variants);
     }
 
-    protected abstract applyElementStyle(): void;
+    protected abstract applyElementStyle(variants: Variant[]): void;
 
-    protected abstract applyLayout(): void;
+    protected abstract applyLayout(variants: Variant[]): void;
 
     protected abstract addElements(variants: Variant[]): void;
 
