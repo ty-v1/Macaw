@@ -1,5 +1,6 @@
 import {Variant} from "@/scripts/data/Variant";
+import {NodeSingular} from "cytoscape";
 
 export interface INodeHeightStrategy {
-    createNodeHeight(variant: Variant): number | undefined;
+    createNodeHeight(data: NodeSingular | Variant): number | undefined;
 }

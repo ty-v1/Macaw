@@ -1,18 +1,15 @@
-import {Vue} from "vue-property-decorator";
 import {INetworkLayoutCreator} from "@/scripts/network/layout/INetworkLayoutCreator";
 import {ElementStyleCreator} from "@/scripts/network/style/ElementStyleCreator";
 import {Variant} from "@/scripts/data/Variant";
 import {Event, ipcRenderer} from "electron";
 import {BreadthFirstLayout} from "@/scripts/network/layout/BreadthFirstLayout";
+import {Vue} from "vue-property-decorator";
+import {Channel} from "@/scripts/ipc/Channel";
 
 export abstract class AbstractNetworkComponent extends Vue {
 
     protected networkLayoutCreator: INetworkLayoutCreator = new BreadthFirstLayout();
     protected elementStyleCreator: ElementStyleCreator = new ElementStyleCreator();
-
-    protected constructor() {
-        super();
-    }
 
     /**
      * ネットワークライブラリのセットアップ
@@ -29,7 +26,7 @@ export abstract class AbstractNetworkComponent extends Vue {
      * */
     private setUpIPC(): void {
         // jsonファイルの読み込み終了時の動作
-        ipcRenderer.on(FileRead.CHANNEL, (event: Event, jsonString: string) => {
+        ipcRenderer.on(Channel.FILE_READ, (event: Event, jsonString: string) => {
             // jsonのパースを同期的に行う
             this.$store.commit('parseJson', {jsonString: jsonString});
             const variants: Variant[] = this.$store.getters.getAllVariants(this.$store);
@@ -41,13 +38,13 @@ export abstract class AbstractNetworkComponent extends Vue {
      * メインプロセスとの通信の初期化
      * */
     private tearDownIPC(): void {
-        ipcRenderer.removeAllListeners(FileRead.CHANNEL);
+        ipcRenderer.removeAllListeners(Channel.FILE_READ);
     }
 
     /**
      * マウント時に呼び出す
      * */
-    protected onMounted() {
+    protected mounted() {
         this.setUpGraphLibrary();
         this.setUpIPC();
     }
@@ -55,7 +52,7 @@ export abstract class AbstractNetworkComponent extends Vue {
     /**
      * 破棄時に呼び出す
      * */
-    protected onDestroied() {
+    protected destroyed() {
         this.tearDownGraphLibrary();
         this.tearDownIPC();
     }
@@ -64,24 +61,23 @@ export abstract class AbstractNetworkComponent extends Vue {
     private setVariants(variants: Variant[]): void {
         this.removeAllElements();
         this.addElements(variants);
-
-        this.applyElementStyle();
-        this.applyLayout();
     }
 
     public setNetworkLayout(networkLayout: INetworkLayoutCreator): void {
         this.networkLayoutCreator = networkLayout;
-        this.applyLayout();
+        const variants: Variant[] = this.$store.getters.getAllVariants(this.$store);
+        this.applyLayout(variants);
     }
 
     public setElementStyleFactory(elementStyleFactory: ElementStyleCreator): void {
         this.elementStyleCreator = elementStyleFactory;
-        this.applyElementStyle();
+        const variants: Variant[] = this.$store.getters.getAllVariants(this.$store);
+        this.applyElementStyle(variants);
     }
 
-    protected abstract applyElementStyle(): void;
+    protected abstract applyElementStyle(variants: Variant[]): void;
 
-    protected abstract applyLayout(): void;
+    protected abstract applyLayout(variants: Variant[]): void;
 
     protected abstract addElements(variants: Variant[]): void;
 

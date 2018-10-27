@@ -23,6 +23,7 @@ import {DefaultNodeWidth} from "@/scripts/network/style/node/default/DefaultNode
 import {DefaultNodeHeight} from "@/scripts/network/style/node/default/DefaultNodeHeight";
 import {DefaultNodeX} from "@/scripts/network/style/node/default/DefaultNodeX";
 import {DefaultNodeY} from "@/scripts/network/style/node/default/DefaultNodeY";
+import {EdgeSingular, NodeSingular} from "cytoscape";
 import Edge = cytoscape.Css.Edge;
 import Node = cytoscape.Css.Node;
 
@@ -44,24 +45,24 @@ export class ElementStyleCreator {
     private nodeXStrategy: INodeXStrategy = new DefaultNodeX();
     private nodeYStrategy: INodeYStrategy = new DefaultNodeY();
 
-    public createCytoscapeEdgeStyle(variant: Variant): Edge {
+    public createCytoscapeEdgeStyle(data: EdgeSingular | Variant): Edge {
         return {
-            'target-arrow-shape': this.edgeArrowShapeStrategy.createEdgeArrowShape(variant),
-            'width': this.edgeWidthStrategy.createEdgeWidth(variant),
-            'line-color': this.edgeColorStrategy.createEdgeColor(variant),
-            'line-style': this.edgeLineStrategy.createEdgeLine(variant),
+            'target-arrow-shape': this.edgeArrowShapeStrategy.createEdgeArrowShape(data),
+            'width': this.edgeWidthStrategy.createEdgeWidth(data),
+            'line-color': this.edgeColorStrategy.createEdgeColor(data),
+            'line-style': this.edgeLineStrategy.createEdgeLine(data),
         };
     }
 
     // TODO 座標操作は別メソッドに切り分ける
-    public createCytoscapeNodeStyle(variant: Variant): Node {
+    public createCytoscapeNodeStyle(data: NodeSingular | Variant): Node {
         return {
-            'border-width': this.nodeBorderWidthStrategy.createNodeBorderWidth(variant),
-            'border-color': this.nodeBorderColorStrategy.createNodeBorderColor(variant),
-            'background-color': this.nodeColorStrategy.createNodeColor(variant),
-            'shape': this.nodeShapeStrategy.createNodeShape(variant),
-            'width': this.nodeWidthStrategy.createNodeWidth(variant),
-            'height': this.nodeHeightStrategy.createNodeHeight(variant)
+            'border-width': this.nodeBorderWidthStrategy.createNodeBorderWidth(data),
+            'border-color': this.nodeBorderColorStrategy.createNodeBorderColor(data),
+            'background-color': this.nodeColorStrategy.createNodeColor(data),
+            'shape': this.nodeShapeStrategy.createNodeShape(data),
+            'width': this.nodeWidthStrategy.createNodeWidth(data),
+            'height': this.nodeHeightStrategy.createNodeHeight(data)
         };
     }
 

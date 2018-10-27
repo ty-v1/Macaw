@@ -1,5 +1,6 @@
 import {Variant} from "@/scripts/data/Variant";
+import {EdgeSingular} from "cytoscape";
 
 export interface IEdgeWidthStrategy {
-    createEdgeWidth(variant: Variant): number;
+    createEdgeWidth(data: EdgeSingular | Variant): number;
 }

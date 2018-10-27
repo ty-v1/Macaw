@@ -1,6 +1,7 @@
 import {Variant} from "@/scripts/data/Variant";
+import {EdgeSingular} from "cytoscape";
 import LineStyle = cytoscape.Css.LineStyle;
 
 export interface IEdgeLineStrategy {
-    createEdgeLine(variant: Variant): LineStyle;
+    createEdgeLine(data: EdgeSingular | Variant): LineStyle;
 }
