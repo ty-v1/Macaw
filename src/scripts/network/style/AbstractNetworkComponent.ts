@@ -4,6 +4,7 @@ import {Variant} from "@/scripts/data/Variant";
 import {Event, ipcRenderer} from "electron";
 import {BreadthFirstLayout} from "@/scripts/network/layout/BreadthFirstLayout";
 import {Vue} from "vue-property-decorator";
+import {Channel} from "@/scripts/ipc/Channel";
 
 export abstract class AbstractNetworkComponent extends Vue {
 
@@ -25,7 +26,7 @@ export abstract class AbstractNetworkComponent extends Vue {
      * */
     private setUpIPC(): void {
         // jsonファイルの読み込み終了時の動作
-        ipcRenderer.on(FileRead.CHANNEL, (event: Event, jsonString: string) => {
+        ipcRenderer.on(Channel.FILE_READ, (event: Event, jsonString: string) => {
             // jsonのパースを同期的に行う
             this.$store.commit('parseJson', {jsonString: jsonString});
             const variants: Variant[] = this.$store.getters.getAllVariants(this.$store);
@@ -37,13 +38,13 @@ export abstract class AbstractNetworkComponent extends Vue {
      * メインプロセスとの通信の初期化
      * */
     private tearDownIPC(): void {
-        ipcRenderer.removeAllListeners(FileRead.CHANNEL);
+        ipcRenderer.removeAllListeners(Channel.FILE_READ);
     }
 
     /**
      * マウント時に呼び出す
      * */
-    mounted() {
+    protected mounted() {
         this.setUpGraphLibrary();
         this.setUpIPC();
     }
@@ -51,7 +52,7 @@ export abstract class AbstractNetworkComponent extends Vue {
     /**
      * 破棄時に呼び出す
      * */
-    destroyed() {
+    protected destroyed() {
         this.tearDownGraphLibrary();
         this.tearDownIPC();
     }
