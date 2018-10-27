@@ -55,7 +55,7 @@ export abstract class AbstractNetworkComponent extends Vue {
     /**
      * 破棄時に呼び出す
      * */
-    protected onDestroied() {
+    protected onDestroyed() {
         this.tearDownGraphLibrary();
         this.tearDownIPC();
     }
