@@ -1,9 +1,9 @@
-import {Vue} from "vue-property-decorator";
 import {INetworkLayoutCreator} from "@/scripts/network/layout/INetworkLayoutCreator";
 import {ElementStyleCreator} from "@/scripts/network/style/ElementStyleCreator";
 import {Variant} from "@/scripts/data/Variant";
 import {Event, ipcRenderer} from "electron";
 import {BreadthFirstLayout} from "@/scripts/network/layout/BreadthFirstLayout";
+import {Vue} from "vue-property-decorator";
 
 export abstract class AbstractNetworkComponent extends Vue {
 
