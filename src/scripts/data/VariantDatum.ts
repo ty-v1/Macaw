@@ -1,5 +1,5 @@
-import {Patch} from './Patch';
-import {Operation} from './Operation';
+import {Operation} from "@/scripts/data/Operation";
+import {Patch} from "@/scripts/data/Patch";
 
 export type VariantDatum = {
     id: string;
@@ -7,6 +7,6 @@ export type VariantDatum = {
     fitness: number;
     buildSuccess: boolean;
     testResult: number;
-    patch: Patch[];
+    patches: Patch[];
     operations: Operation[];
 }
