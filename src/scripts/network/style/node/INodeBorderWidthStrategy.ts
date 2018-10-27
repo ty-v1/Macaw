@@ -1,5 +1,8 @@
 import {Variant} from "@/scripts/data/Variant";
+import {NodeSingular} from "cytoscape";
 
 export interface INodeBorderWidthStrategy {
-    createNodeBorderWidth(variant: Variant): number;
+    createNodeBorderWidth(data: NodeSingular): number;
+
+    createNodeBorderWidth(data: Variant): number;
 }
