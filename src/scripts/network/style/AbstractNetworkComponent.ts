@@ -10,10 +10,6 @@ export abstract class AbstractNetworkComponent extends Vue {
     protected networkLayoutCreator: INetworkLayoutCreator = new BreadthFirstLayout();
     protected elementStyleCreator: ElementStyleCreator = new ElementStyleCreator();
 
-    protected constructor() {
-        super();
-    }
-
     /**
      * ネットワークライブラリのセットアップ
      * */
@@ -47,7 +43,7 @@ export abstract class AbstractNetworkComponent extends Vue {
     /**
      * マウント時に呼び出す
      * */
-    protected onMounted() {
+    mounted() {
         this.setUpGraphLibrary();
         this.setUpIPC();
     }
@@ -55,7 +51,7 @@ export abstract class AbstractNetworkComponent extends Vue {
     /**
      * 破棄時に呼び出す
      * */
-    protected onDestroyed() {
+    destroyed() {
         this.tearDownGraphLibrary();
         this.tearDownIPC();
     }
