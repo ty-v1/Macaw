@@ -10,6 +10,9 @@
  * }
  *
  * */
+export class Channel {
+    public static readonly FILE_READ = "file-read";
+}
 
 module FileRead {
     export const CHANNEL = "file-read";
