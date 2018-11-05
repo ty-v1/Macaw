@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import {Variant} from '@/scripts/data/Variant';
 import HashMap from 'hashmap';
 import {VariantDatum} from '@/scripts/data/VariantDatum';
+import {JSONData} from "@/scripts/data/JSONData";
 
 Vue.use(Vuex);
 
@@ -10,7 +11,8 @@ export default new Vuex.Store({
     state: {
         // id -> Variant
         idToVariant: new HashMap<string, Variant>(),
-        maxGenerationNumber: 0
+        maxGenerationNumber: 0,
+        projectName: ""
     },
     getters: {
         getAllVariants: (state) => state.idToVariant.values(),
@@ -34,11 +36,13 @@ export default new Vuex.Store({
 
             return maxFitness;
         },
+        getProjectName: (state) => state.projectName
     },
     mutations: {
         parseJson: (state, payload) => {
             const jsonString: string = payload.jsonString;
-            const variantData: VariantDatum[] = JSON.parse(jsonString);
+            const jsonData: JSONData = JSON.parse(jsonString);
+            const variantData: VariantDatum[] = jsonData.variants;
 
             // jsonからオブジェクトを作る
             const variants: Variant[] = [];
