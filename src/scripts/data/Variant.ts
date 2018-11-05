@@ -8,6 +8,7 @@ export class Variant {
     private readonly generationNumber: number;
     private readonly fitness: number;
     private readonly buildSuccess: boolean;
+    private readonly selectionCount: number;
     private readonly patches: Patch[];
     private readonly operations: Operation[];
     private readonly testSummary: TestSummary;
@@ -15,7 +16,8 @@ export class Variant {
     private readonly selected: boolean;
 
     public constructor(id: string, generationNumber: number, fitness: number, buildSuccess: boolean,
-                       patches: Patch[], operations: Operation[], testSummary: TestSummary, parentId?: string, selected: boolean = false) {
+                       selectionCount: number, patches: Patch[], operations: Operation[],
+                       testSummary: TestSummary, parentId?: string, selected: boolean = false) {
         this.id = id;
         this.generationNumber = generationNumber;
         this.fitness = fitness;
@@ -23,6 +25,7 @@ export class Variant {
         this.patches = patches;
         this.testSummary = testSummary;
         this.selected = selected;
+        this.selectionCount = selectionCount;
 
         if (this.selected && parentId !== undefined) {
             this.operations = [
