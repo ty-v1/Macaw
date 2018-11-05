@@ -1,37 +1,60 @@
 import {Patch} from "@/scripts/data/Patch";
-import {VariantDatum} from "@/scripts/data/VariantDatum";
 import {Operation} from "@/scripts/data/Operation";
+import {TestSummary} from "@/scripts/data/TestSummary";
 
 export class Variant {
 
-    private readonly datum: VariantDatum;
+    private readonly id: string;
+    private readonly generationNumber: number;
+    private readonly fitness: number;
+    private readonly buildSuccess: boolean;
+    private readonly patches: Patch[];
+    private readonly operations: Operation[];
+    private readonly testSummary: TestSummary;
 
-    public constructor(datum: VariantDatum) {
-        this.datum = datum;
+    private readonly selected: boolean;
+
+    public constructor(id: string, generationNumber: number, fitness: number, buildSuccess: boolean,
+                       patches: Patch[], operations: Operation[], testSummary: TestSummary, parentId?: string, selected: boolean = false) {
+        this.id = id;
+        this.generationNumber = generationNumber;
+        this.fitness = fitness;
+        this.buildSuccess = buildSuccess;
+        this.patches = patches;
+        this.testSummary = testSummary;
+        this.selected = selected;
+
+        if (this.selected && parentId !== undefined) {
+            this.operations = [
+                {
+                    id: parentId,
+                    operationName: "select"
+                }
+            ];
+        } else {
+            this.operations = operations;
+        }
     }
 
+    // getter
     public getId(): string {
-        return this.datum.id;
+        return this.id;
     }
 
     public getOperations(): Operation[] {
-        return this.datum.operations;
+        return this.operations;
     }
 
     public getPatches(): Patch[] {
-        return this.datum.patches;
+        return this.patches;
     }
 
     public getFitness(): number {
-        return this.datum.fitness;
+        return this.fitness;
     }
 
     public getGenerationNumber(): number {
-        return this.datum.generationNumber;
-    }
-
-    public getSelectionCount(): number {
-        return this.datum.selectionCount;
+        return this.generationNumber;
     }
 
     /**
@@ -39,11 +62,11 @@ export class Variant {
      * */
     public static compare(variantA: Variant, variantB: Variant) {
 
-        const generationNumberA: number = variantA.datum.generationNumber;
-        const fitnessA: number = variantA.datum.fitness;
+        const generationNumberA: number = variantA.generationNumber;
+        const fitnessA: number = variantA.fitness;
 
-        const generationNumberB: number = variantB.datum.generationNumber;
-        const fitnessB: number = variantB.datum.fitness;
+        const generationNumberB: number = variantB.generationNumber;
+        const fitnessB: number = variantB.fitness;
 
         // 世代での比較
         if (generationNumberA > generationNumberB) {
