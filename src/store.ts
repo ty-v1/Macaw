@@ -4,6 +4,9 @@ import {Variant} from '@/scripts/data/Variant';
 import HashMap from 'hashmap';
 import {VariantDatum} from '@/scripts/data/VariantDatum';
 import {JSONData} from "@/scripts/data/JSONData";
+import {Patch} from "@/scripts/data/Patch";
+import {TestSummary} from "@/scripts/data/TestSummary";
+import {Operation} from "@/scripts/data/Operation";
 
 Vue.use(Vuex);
 
@@ -42,33 +45,64 @@ export default new Vuex.Store({
         parseJson: (state, payload) => {
             const jsonString: string = payload.jsonString;
             const jsonData: JSONData = JSON.parse(jsonString);
+            state.projectName = jsonData.projectName;
             const variantData: VariantDatum[] = jsonData.variants;
 
-            // jsonからオブジェクトを作る
-            const variants: Variant[] = [];
-            variantData.forEach((variantDatum: VariantDatum) => {
-                const length = variants.length;
-                variants[length] = new Variant(variantDatum);
-            });
-
-            // TODO コピー(選択)の解決をする
-
+            // コピー(選択)の解決をする
             const idToVariant: HashMap<string, Variant> = new HashMap<string, Variant>();
             let maxGenerationNumber = 0;
+            variantData.forEach((variantDatum) => {
+                const id: string = variantDatum.id;
+                const selectionCount: number = variantDatum.selectionCount;
+                const patches: Patch[] = variantDatum.patches;
+                const fitness: number = variantDatum.fitness;
+                const buildSuccess: boolean = variantDatum.isBuildSuccess;
+                const generationNumber: number = variantDatum.generationNumber;
+                const testSummary: TestSummary = variantDatum.testSummary;
+                const operations: Operation[] = variantDatum.operations;
+                // 親のVariantを追加する
+                const parent: Variant = new Variant(id, generationNumber, fitness, buildSuccess,
+                    selectionCount, patches, operations, testSummary);
+                idToVariant.set(id, parent);
 
-            variants.forEach((variant: Variant) => {
-                const id: string = variant.getId();
-                idToVariant.set(id, variant);
-
-                const generationNumber = variant.getGenerationNumber();
+                for (let i = 1; i <= selectionCount; i++) {
+                    const selectedVariantId: string = id.concat(String(i));
+                    const operations: Operation[] = [{
+                        id: id,
+                        operationName: 'select'
+                    }];
+                    const variant: Variant = new Variant(selectedVariantId, generationNumber + i,
+                        fitness, buildSuccess, selectionCount, patches, operations, testSummary, true);
+                    idToVariant.set(selectedVariantId, variant);
+                }
 
                 if (maxGenerationNumber < generationNumber) {
                     maxGenerationNumber = generationNumber;
                 }
             });
+            state.maxGenerationNumber = maxGenerationNumber;
+
+            // 選択されたVariantの子の親IDを書き換える
+            idToVariant.values().forEach((variant) => {
+
+                if (variant.isSelected()) {
+                    return;
+                }
+
+                const childGenerationNumber = variant.getGenerationNumber();
+
+                variant.getParentIds().forEach((oldParentId) => {
+                    const parentGenerationNumber = idToVariant.get(oldParentId).getGenerationNumber();
+                    const generationSub = parentGenerationNumber - childGenerationNumber;
+                    if (generationSub === 1) {
+                        return;
+                    }
+                    const newParentId: string = oldParentId.concat(String(generationSub - 1));
+                    variant.changeParentId(oldParentId, newParentId);
+                });
+            });
 
             state.idToVariant = idToVariant;
-            state.maxGenerationNumber = maxGenerationNumber;
         }
 
     },

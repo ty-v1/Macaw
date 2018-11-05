@@ -1,33 +1,73 @@
 import {Patch} from "@/scripts/data/Patch";
-import {VariantDatum} from "@/scripts/data/VariantDatum";
 import {Operation} from "@/scripts/data/Operation";
+import {TestSummary} from "@/scripts/data/TestSummary";
+import HashMap from "hashmap";
 
 export class Variant {
 
-    private readonly datum: VariantDatum;
+    private readonly id: string;
+    private readonly generationNumber: number;
+    private readonly fitness: number;
+    private readonly buildSuccess: boolean;
+    private readonly selectionCount: number;
+    private readonly patches: Patch[];
+    private readonly idToOperations: HashMap<string, Operation>;
+    private readonly testSummary: TestSummary;
 
-    public constructor(datum: VariantDatum) {
-        this.datum = datum;
+    private readonly selected: boolean;
+
+    public constructor(id: string, generationNumber: number, fitness: number, buildSuccess: boolean,
+                       selectionCount: number, patches: Patch[], operations: Operation[],
+                       testSummary: TestSummary, selected: boolean = false) {
+        this.id = id;
+        this.generationNumber = generationNumber;
+        this.fitness = fitness;
+        this.buildSuccess = buildSuccess;
+        this.patches = patches;
+        this.testSummary = testSummary;
+        this.selected = selected;
+        this.selectionCount = selectionCount;
+
+        this.idToOperations = new HashMap<string, Operation>();
+        operations.forEach((operation) => {
+            this.idToOperations.set(operation.id, operation);
+        });
     }
 
+    // getter
     public getId(): string {
-        return this.datum.id;
+        return this.id;
     }
 
-    public getOperations(): Operation[] {
-        return this.datum.operations;
+    public getParentIds(): string[] {
+        return this.idToOperations.keys();
+    }
+
+    public getOperation(id: string): Operation {
+        return this.idToOperations.get(id);
+    }
+
+    public changeParentId(oldId: string, newId: string): void {
+        const operation: Operation = this.getOperation(oldId);
+        this.idToOperations.remove(oldId);
+        operation.id = newId;
+        this.idToOperations.set(newId, operation);
     }
 
     public getPatches(): Patch[] {
-        return this.datum.patches;
+        return this.patches;
     }
 
     public getFitness(): number {
-        return this.datum.fitness;
+        return this.fitness;
     }
 
     public getGenerationNumber(): number {
-        return this.datum.generationNumber;
+        return this.generationNumber;
+    }
+
+    public isSelected(): boolean {
+        return this.selected;
     }
 
     /**
@@ -35,11 +75,11 @@ export class Variant {
      * */
     public static compare(variantA: Variant, variantB: Variant) {
 
-        const generationNumberA: number = variantA.datum.generationNumber;
-        const fitnessA: number = variantA.datum.fitness;
+        const generationNumberA: number = variantA.generationNumber;
+        const fitnessA: number = variantA.fitness;
 
-        const generationNumberB: number = variantB.datum.generationNumber;
-        const fitnessB: number = variantB.datum.fitness;
+        const generationNumberB: number = variantB.generationNumber;
+        const fitnessB: number = variantB.fitness;
 
         // 世代での比較
         if (generationNumberA > generationNumberB) {
