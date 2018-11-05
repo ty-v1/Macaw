@@ -1,17 +1,13 @@
 <template>
     <div class="home">
-        <CytoscapeJS></CytoscapeJS>
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import CytoscapeJS from "../components/CytoscapeJS.vue"; // @ is an alias to /src
 
     @Component({
-        components: {
-            CytoscapeJS
-        },
+        components: {},
     })
     export default class Home extends Vue {
     }
