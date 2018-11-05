@@ -2,13 +2,13 @@ import {INetworkLayoutCreator} from "@/scripts/network/layout/INetworkLayoutCrea
 import {ElementStyleCreator} from "@/scripts/network/style/ElementStyleCreator";
 import {Variant} from "@/scripts/data/Variant";
 import {Event, ipcRenderer} from "electron";
-import {BreadthFirstLayout} from "@/scripts/network/layout/BreadthFirstLayout";
 import {Vue} from "vue-property-decorator";
 import {Channel} from "@/scripts/ipc/Channel";
+import {DefaultNetworkLayout} from "@/scripts/network/layout/DefaultNetworkLayout";
 
 export abstract class AbstractNetworkComponent extends Vue {
 
-    protected networkLayoutCreator: INetworkLayoutCreator = new BreadthFirstLayout();
+    protected networkLayoutCreator: INetworkLayoutCreator = new DefaultNetworkLayout();
     protected elementStyleCreator: ElementStyleCreator = new ElementStyleCreator();
 
     /**
