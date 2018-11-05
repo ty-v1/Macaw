@@ -1,6 +1,7 @@
 import {Patch} from "@/scripts/data/Patch";
 import {Operation} from "@/scripts/data/Operation";
 import {TestSummary} from "@/scripts/data/TestSummary";
+import HashMap from "hashmap";
 
 export class Variant {
 
@@ -10,14 +11,14 @@ export class Variant {
     private readonly buildSuccess: boolean;
     private readonly selectionCount: number;
     private readonly patches: Patch[];
-    private readonly operations: Operation[];
+    private readonly idToOperations: HashMap<string, Operation>;
     private readonly testSummary: TestSummary;
 
     private readonly selected: boolean;
 
     public constructor(id: string, generationNumber: number, fitness: number, buildSuccess: boolean,
                        selectionCount: number, patches: Patch[], operations: Operation[],
-                       testSummary: TestSummary, parentId?: string, selected: boolean = false) {
+                       testSummary: TestSummary, selected: boolean = false) {
         this.id = id;
         this.generationNumber = generationNumber;
         this.fitness = fitness;
@@ -27,16 +28,10 @@ export class Variant {
         this.selected = selected;
         this.selectionCount = selectionCount;
 
-        if (this.selected && parentId !== undefined) {
-            this.operations = [
-                {
-                    id: parentId,
-                    operationName: "select"
-                }
-            ];
-        } else {
-            this.operations = operations;
-        }
+        this.idToOperations = new HashMap<string, Operation>();
+        operations.forEach((operation) => {
+            this.idToOperations.set(operation.id, operation);
+        });
     }
 
     // getter
@@ -44,8 +39,19 @@ export class Variant {
         return this.id;
     }
 
-    public getOperations(): Operation[] {
-        return this.operations;
+    public getParentIds(): string[] {
+        return this.idToOperations.keys();
+    }
+
+    public getOperation(id: string): Operation {
+        return this.idToOperations.get(id);
+    }
+
+    public changeParentId(oldId: string, newId: string): void {
+        const operation: Operation = this.getOperation(oldId);
+        this.idToOperations.remove(oldId);
+        operation.id = newId;
+        this.idToOperations.set(newId, operation);
     }
 
     public getPatches(): Patch[] {
@@ -58,6 +64,10 @@ export class Variant {
 
     public getGenerationNumber(): number {
         return this.generationNumber;
+    }
+
+    public isSelected(): boolean {
+        return this.selected;
     }
 
     /**
