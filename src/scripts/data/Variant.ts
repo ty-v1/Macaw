@@ -30,6 +30,10 @@ export class Variant {
         return this.datum.generationNumber;
     }
 
+    public getSelectionCount(): number {
+        return this.datum.selectionCount;
+    }
+
     /**
      * バリアントの比較をする
      * */
