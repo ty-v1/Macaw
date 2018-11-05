@@ -1,4 +1,4 @@
 export type TestResult = {
-    fqn: string;
-    isSuccess: boolean;
+    fqn: string,
+    isSuccess: boolean
 }
