@@ -70,6 +70,10 @@ export class Variant {
         return this.selected;
     }
 
+    public isBuildSuccess(): boolean {
+        return this.buildSuccess;
+    }
+
     /**
      * バリアントの比較をする
      * */
