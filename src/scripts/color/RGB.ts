@@ -1,7 +1,6 @@
-import {IColorCode} from "@/scripts/color/IColorCode";
 import {sprintf} from "sprintf-js";
 
-export class RGB implements IColorCode {
+export class RGB {
 
     private readonly r: string;
     private readonly g: string;
@@ -25,7 +24,7 @@ export class RGB implements IColorCode {
         return this.b;
     }
 
-    toHtmlAttribute(): string {
+    public toString(): string {
         return sprintf("#%s%s%s", this.r, this.g, this.b);
     }
 
