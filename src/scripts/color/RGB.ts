@@ -12,16 +12,16 @@ export class RGB {
         this.b = b;
     }
 
-    public getR(): string {
-        return this.r;
+    public getR(): number {
+        return parseInt(this.r, 16);
     }
 
-    public getG(): string {
-        return this.g;
+    public getG(): number {
+        return parseInt(this.g, 16);
     }
 
-    public getB(): string {
-        return this.b;
+    public getB(): number {
+        return parseInt(this.b, 16);
     }
 
     public toString(): string {
