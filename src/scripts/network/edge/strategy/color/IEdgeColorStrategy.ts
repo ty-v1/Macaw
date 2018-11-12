@@ -1,5 +1,6 @@
 import {Variant} from "@/scripts/data/Variant";
+import {RGB} from "@/scripts/color/RGB";
 
 export interface IEdgeColorStrategy {
-    createEdgeColor(data: Variant): string;
+    createEdgeColor(variant: Variant): RGB;
 }
