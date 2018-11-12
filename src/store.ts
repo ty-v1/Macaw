@@ -14,6 +14,7 @@ export default new Vuex.Store({
     state: {
         // id -> Variant
         idToVariant: new HashMap<string, Variant>(),
+        generationNumberToVariantCount: [0],
         maxGenerationNumber: 0,
         projectName: ""
     },
@@ -22,7 +23,8 @@ export default new Vuex.Store({
         getVariant: (state) => (id: string) => {
             state.idToVariant.get(id)
         },
-        getGenerationValue: (state) => state.maxGenerationNumber,
+        getGenerationNumberToVariantCount: (state) => state.generationNumberToVariantCount,
+        getMaxGenerationNumber: (state) => state.maxGenerationNumber,
         maxFitness: (state) => () => {
             const variants: Variant[] = state.idToVariant.values();
             const maxFitness: number[] = [state.maxGenerationNumber + 1].map(() => 0);
@@ -103,8 +105,18 @@ export default new Vuex.Store({
             });
 
             state.idToVariant = idToVariant;
-        }
 
+            // 世代ごとのvariantの数を求める
+            const generationNumberToVariantCount
+                = new Array(maxGenerationNumber + 1);
+            generationNumberToVariantCount.fill(0);
+
+            idToVariant.values().forEach((variant) => {
+                generationNumberToVariantCount[variant.getGenerationNumber()]++;
+            });
+
+            state.generationNumberToVariantCount = generationNumberToVariantCount;
+        }
     },
     actions: {}
 })
