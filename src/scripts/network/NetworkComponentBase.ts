@@ -1,19 +1,20 @@
 import {Variant} from "../data/Variant";
 import {Event, ipcRenderer} from "electron";
-import {Vue} from "vue-property-decorator";
+import Vue from "vue";
 import {Channel} from "../ipc/Channel";
+import Component from "vue-class-component";
 
-export abstract class AbstractNetworkComponent extends Vue {
-
-    /**
-     * ネットワークライブラリのセットアップ
-     * */
-    protected abstract setUpGraphLibrary(): void;
+@Component
+export default class NetworkComponentBase extends Vue {
 
     /**
-     * ネットワークライブラリの初期化
+     * data
      * */
-    protected abstract tearDownGraphLibrary(): void;
+    width: number = 100;
+    height: number = 100;
+
+    protected variants: Variant[] = [];
+    protected maxGenerationNumber: number = 0;
 
     /**
      * メインプロセスとの通信の初期設定
@@ -23,8 +24,9 @@ export abstract class AbstractNetworkComponent extends Vue {
         ipcRenderer.on(Channel.FILE_READ, (event: Event, jsonString: string) => {
             // jsonのパースを同期的に行う
             this.$store.commit('parseJson', {jsonString: jsonString});
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store);
-            this.applyLayout(variants);
+            this.variants = this.$store.getters.getAllVariants(this.$store);
+            this.maxGenerationNumber = this.$store.getters.getMaxGenerationNumber(this.$store);
+            this.applyLayout();
         });
     }
 
@@ -38,18 +40,17 @@ export abstract class AbstractNetworkComponent extends Vue {
     /**
      * マウント時に呼び出す
      * */
-    protected mounted() {
-        this.setUpGraphLibrary();
+    mounted() {
         this.setUpIPC();
     }
 
     /**
      * 破棄時に呼び出す
      * */
-    protected destroyed() {
-        this.tearDownGraphLibrary();
+    destroyed() {
         this.tearDownIPC();
     }
 
-    protected abstract applyLayout(variants: Variant[]): void;
+    protected applyLayout(): void {
+    }
 }
