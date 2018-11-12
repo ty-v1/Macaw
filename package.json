@@ -12,9 +12,11 @@
   "dependencies": {
     "@types/hashmap": "^2.0.29",
     "@types/node": "^10.12.0",
+    "@types/sprintf-js": "^1.1.1",
     "ajv": "^6.5.4",
     "hashmap": "^2.3.0",
     "register-service-worker": "^1.0.0",
+    "sprintf-js": "^1.1.1",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",
