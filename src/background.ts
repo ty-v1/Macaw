@@ -31,7 +31,7 @@ function readFile(filePaths: string[], bookmarks: string[]): void {
             console.log(err);
             return;
         } else if (win !== null) {
-            win.webContents.send(Channel.FILE_READ, data);
+            win.webContents.send(Channel.FILE_READ, data.toString());
         }
     });
 }
@@ -92,6 +92,34 @@ function createMenu(): void {
             ]
         }
     ];
+
+    // mac のときだけメニューの表示位置を変える
+    if (process.platform === 'darwin') {
+        menuTemplate.unshift({
+                                 label: app.getName(),
+                                 submenu: [
+                                     {
+                                         role: 'about'
+                                     },
+                                     {
+                                         role: 'hide'
+                                     },
+                                     {
+                                         role: 'hideothers'
+                                     },
+                                     {
+                                         role: 'unhide'
+                                     },
+                                     {
+                                         type: 'separator'
+                                     },
+                                     {
+                                         role: 'quit'
+                                     }
+                                 ]
+                             });
+    }
+
     const menu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menu);
 }
