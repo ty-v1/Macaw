@@ -12,7 +12,7 @@ import {
 } from 'electron';
 import {createProtocol, installVueDevtools} from 'vue-cli-plugin-electron-builder/lib';
 import fs from "fs-extra";
-import {Channel} from "@/scripts/ipc/Channel";
+import {Channel} from "./scripts/ipc/Channel";
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
