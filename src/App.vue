@@ -1,5 +1,9 @@
 <template>
-    <div id="app">
+    <div id="app"
+         @dragover="onDragOver"
+         @dragleave="onDragLeave"
+         @dragend="onDragEnd"
+         @drop="onDrop">
         <div id="nav">
             <router-link to="/">Home</router-link>
             |
@@ -8,6 +12,44 @@
         <router-view/>
     </div>
 </template>
+
+<script lang="ts">
+    import {Component, Vue} from 'vue-property-decorator';
+
+    @Component
+    export default class App extends Vue {
+        /**
+         * event handlers
+         * */
+        onDragOver(event: DragEvent) {
+            event.preventDefault();
+            return false;
+        }
+
+        onDragLeave(event: DragEvent) {
+            event.preventDefault();
+            return false;
+        }
+
+        onDragEnd(event: DragEvent) {
+            event.preventDefault();
+            return false;
+        }
+
+        onDrop(event: DragEvent) {
+            // イベントの伝搬を止めて、アプリケーションのHTMLとファイルが差し替わらないようにする
+            event.preventDefault();
+
+            if (event.dataTransfer !== null && event.dataTransfer.files[0] !== null) {
+                const file: File = event.dataTransfer.files[0];
+                // TODO ipcの設定
+                console.log(file.path);
+            }
+
+            return false;
+        }
+    }
+</script>
 
 <style lang="scss">
     #app {
