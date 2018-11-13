@@ -38,9 +38,9 @@ export default class NetworkComponentBase extends Vue {
     }
 
     /**
-     * マウント時に呼び出す
+     * 初期化前に呼び出す
      * */
-    mounted() {
+    beforeCreate() {
         this.setUpIPC();
     }
 
