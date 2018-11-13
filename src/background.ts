@@ -1,7 +1,18 @@
 'use strict';
 
-import {app, BrowserWindow, protocol} from 'electron';
+import {
+    app,
+    BrowserWindow,
+    dialog,
+    Menu,
+    MenuItem,
+    MenuItemConstructorOptions,
+    OpenDialogOptions,
+    protocol
+} from 'electron';
 import {createProtocol, installVueDevtools} from 'vue-cli-plugin-electron-builder/lib';
+import fs from "fs-extra";
+import {Channel} from "@/scripts/ipc/Channel";
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -12,9 +23,84 @@ let win: Electron.BrowserWindow | null;
 // Standard scheme must be registered before the app is ready
 protocol.registerStandardSchemes(['app'], {secure: true});
 
+// レンダラプロセスに読み込んだデータを送信する
+function readFile(filePaths: string[], bookmarks: string[]): void {
+    const filePath: string = filePaths[0];
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            console.log(err);
+            return;
+        } else if (win !== null) {
+            win.webContents.send(Channel.FILE_READ, data);
+        }
+    });
+}
+
+// メニューのセットアップ
+const OPEN_DIALOG_OPTIONS: OpenDialogOptions = {
+    title: 'Import JSON File',
+    defaultPath: app.getPath('home'),
+    filters: [
+        {name: 'JSON File', extensions: ['json']}
+    ],
+    properties: ['openFile']
+};
+
+function createMenu(): void {
+    // ElectronのMenuのテンプレート
+    const menuTemplate: MenuItemConstructorOptions[] = [
+        {
+            label: 'File',
+            submenu: [
+                {
+                    label: 'import',
+                    click(item: MenuItem, window: BrowserWindow) {
+                        dialog.showOpenDialog(window, OPEN_DIALOG_OPTIONS, readFile);
+                    }
+                },
+                {
+                    role: 'redo',
+                },
+            ]
+        },
+        {
+            label: 'View',
+            submenu: [
+                {
+                    label: 'reload',
+                    click(item: MenuItem, window: BrowserWindow) {
+                        if (window) {
+                            window.reload()
+                        }
+                    },
+                },
+                {
+                    label: 'change style',
+                },
+                {
+                    role: 'resetzoom',
+                },
+                {
+                    role: 'zoomin',
+                },
+                {
+                    role: 'zoomout',
+                },
+                {
+                    role: 'togglefullscreen',
+                }
+            ]
+        }
+    ];
+    const menu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(menu);
+}
+
+
 function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({width: 800, height: 600});
+    createMenu();
 
     if (isDevelopment) {
         // Load the url of the dev server if in development mode
