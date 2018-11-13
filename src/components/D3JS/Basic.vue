@@ -99,6 +99,7 @@
          * life cycle methods
          * */
         beforeCreate() {
+            super.beforeCreate();
             this.applyLayout();
         }
 
