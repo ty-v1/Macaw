@@ -57,10 +57,7 @@ function createMenu(): void {
                     click(item: MenuItem, window: BrowserWindow) {
                         dialog.showOpenDialog(window, OPEN_DIALOG_OPTIONS, readFile);
                     }
-                },
-                {
-                    role: 'redo',
-                },
+                }
             ]
         },
         {
@@ -103,15 +100,6 @@ function createMenu(): void {
                                      },
                                      {
                                          role: 'hide'
-                                     },
-                                     {
-                                         role: 'hideothers'
-                                     },
-                                     {
-                                         role: 'unhide'
-                                     },
-                                     {
-                                         type: 'separator'
                                      },
                                      {
                                          role: 'quit'
