@@ -22,13 +22,13 @@ export class ThreeBasePointsGradation implements INodeColorStrategy {
                 this.basePoints[1], this.basePoints[0], fitness);
 
             return ThreeBasePointsGradation.calculateMiddleColorCode(
-                this.basePointColors[1], this.basePointColors[0], ratio);
+                this.basePointColors[0], this.basePointColors[1], ratio);
         } else if (this.basePoints[1] <= fitness && fitness <= this.basePoints[2]) {
             const ratio = ThreeBasePointsGradation.calculateRatio(
                 this.basePoints[2], this.basePoints[1], fitness);
 
             return ThreeBasePointsGradation.calculateMiddleColorCode(
-                this.basePointColors[2], this.basePointColors[1], ratio);
+                this.basePointColors[1], this.basePointColors[2], ratio);
         } else {
             return RGB.BLACK;
         }
