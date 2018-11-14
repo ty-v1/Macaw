@@ -71,6 +71,7 @@ export class SimpleHierarchy {
 
         // 設定したX座標を記憶する
         const generationNumberToCurrentX = new Array(maxGenerationNumber + 1);
+        generationNumberToCurrentX.fill(0);
 
         variants.forEach((variant) => {
             const generationNumber = variant.getGenerationNumber();
@@ -114,7 +115,7 @@ export class SimpleHierarchy {
     private calculateGenerationNumberToVariantCount(variants: Variant[],
                                                     maxGenerationNumber: number): number[] {
         const generationNumberToVariantCount = new Array(maxGenerationNumber + 1);
-
+        generationNumberToVariantCount.fill(0);
         variants.forEach((variant) => {
             generationNumberToVariantCount[variant.getGenerationNumber()]++;
         });
