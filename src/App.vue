@@ -41,9 +41,19 @@
 
             if (event.dataTransfer !== null && event.dataTransfer.files[0] !== null) {
                 const file: File = event.dataTransfer.files[0];
-                console.log(file);
-            }
+                const reader: FileReader = new FileReader();
+                // ファイル読み込みに成功したときの処理
+                reader.onload = () => {
+                    const result = reader.result;
 
+                    if (result !== null) {
+                        const jsonString = result.toString();
+                        this.$store.commit('parseJson', {jsonString: jsonString});
+                    }
+                };
+                // ファイル読み込みを実行
+                reader.readAsText(file);
+            }
             return false;
         }
     }
