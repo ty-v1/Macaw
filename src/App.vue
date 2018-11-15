@@ -15,8 +15,6 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {ipcRenderer} from 'electron';
-    import {Channel} from "./scripts/ipc/Channel";
 
     @Component
     export default class App extends Vue {
@@ -39,13 +37,11 @@
         }
 
         onDrop(event: DragEvent) {
-            // イベントの伝搬を止めて、アプリケーションのHTMLとファイルが差し替わらないようにする
             event.preventDefault();
 
             if (event.dataTransfer !== null && event.dataTransfer.files[0] !== null) {
                 const file: File = event.dataTransfer.files[0];
-                // メインプロセスにパスを送信
-                ipcRenderer.send(Channel.FILE_DROPPED, file.path);
+                console.log(file);
             }
 
             return false;
