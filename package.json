@@ -4,20 +4,13 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "electron:build": "vue-cli-service electron:build",
-    "electron:serve": "vue-cli-service electron:serve",
-    "postinstall": "electron-builder install-app-deps"
+    "build": "vue-cli-service build"
   },
   "dependencies": {
-    "@types/fs-extra": "^5.0.4",
     "@types/hashmap": "^2.0.29",
-    "@types/node": "^10.12.0",
     "@types/sprintf-js": "^1.1.1",
     "ajv": "^6.5.4",
-    "fs-extra": "^7.0.1",
     "hashmap": "^2.3.0",
-    "register-service-worker": "^1.0.0",
     "sprintf-js": "^1.1.1",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
@@ -32,11 +25,9 @@
     "@vue/cli-plugin-pwa": "^3.0.5",
     "@vue/cli-plugin-typescript": "^3.0.5",
     "@vue/cli-service": "^3.0.5",
-    "electron": "^2.0.13",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
     "typescript": "^3.0.0",
-    "vue-cli-plugin-electron-builder": "^1.0.0-rc.4",
     "vue-template-compiler": "^2.5.17"
   },
   "postcss": {
@@ -49,5 +40,5 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "main": "background.js"
+  "main": "main.js"
 }
