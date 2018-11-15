@@ -5,9 +5,9 @@
          @dragend="onDragEnd"
          @drop="onDrop">
         <div id="nav">
-            <router-link to="/">Home</router-link>
+            <router-link to="/">Network Graph</router-link>
             |
-            <router-link to="/about">About</router-link>
+            <router-link to="/about">Bar Graph</router-link>
         </div>
         <router-view/>
     </div>
