@@ -35,7 +35,6 @@ export default class NetworkComponentBase extends Vue {
      * 初期化前に呼び出す
      * */
     created() {
-        console.log('fuck');
         this.setUpIPC();
     }
 
