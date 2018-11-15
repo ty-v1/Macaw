@@ -29,7 +29,7 @@ export class RGB {
     }
 
     public static BLACK: RGB = new RGB("00", "00", "00");
-    public static WIHTE: RGB = new RGB("FF", "FF", "FF");
+    public static WHITE: RGB = new RGB("FF", "FF", "FF");
     public static BLUE: RGB = new RGB("00", "00", "FF");
     public static RED: RGB = new RGB("FF", "00", "00");
     public static GREEN: RGB = new RGB("00", "FF", "00");

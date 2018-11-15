@@ -5,9 +5,9 @@
          @dragend="onDragEnd"
          @drop="onDrop">
         <div id="nav">
-            <router-link to="/">Home</router-link>
+            <router-link to="/">Network Graph</router-link>
             |
-            <router-link to="/about">About</router-link>
+            <router-link to="/about">Bar Graph</router-link>
         </div>
         <router-view/>
     </div>
@@ -15,6 +15,8 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
+    import {ipcRenderer} from 'electron';
+    import {Channel} from "./scripts/ipc/Channel";
 
     @Component
     export default class App extends Vue {
@@ -42,8 +44,8 @@
 
             if (event.dataTransfer !== null && event.dataTransfer.files[0] !== null) {
                 const file: File = event.dataTransfer.files[0];
-                // TODO ipcの設定
-                console.log(file.path);
+                // メインプロセスにパスを送信
+                ipcRenderer.send(Channel.FILE_DROPPED, file.path);
             }
 
             return false;

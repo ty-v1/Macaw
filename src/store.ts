@@ -7,6 +7,7 @@ import {JSONData} from "@/scripts/data/JSONData";
 import {Patch} from "@/scripts/data/Patch";
 import {TestSummary} from "@/scripts/data/TestSummary";
 import {Operation} from "@/scripts/data/Operation";
+import {sprintf} from "sprintf-js";
 
 Vue.use(Vuex);
 
@@ -26,12 +27,18 @@ export default new Vuex.Store(
             projectName: ""
         } as State,
         getters: {
-            getAllVariants: (state) => () => {state.idToVariant.values()},
-            getVariant: (state) => (id: string) => {
-                state.idToVariant.get(id)
+            getAllVariants: (state) => () => {
+                return state.idToVariant.values()
             },
-            getGenerationNumberToVariantCount: (state) => () => state.generationNumberToVariantCount,
-            getMaxGenerationNumber: (state) => () => state.maxGenerationNumber,
+            getVariant: (state) => (id: string) => {
+                return state.idToVariant.get(id)
+            },
+            getGenerationNumberToVariantCount: (state) => () => {
+                return state.generationNumberToVariantCount
+            },
+            getMaxGenerationNumber: (state) => () => {
+                return state.maxGenerationNumber
+            },
             maxFitness: (state) => () => {
                 const variants: Variant[] = state.idToVariant.values();
                 const maxFitness: number[] = [state.maxGenerationNumber + 1].map(() => 0);
@@ -48,12 +55,15 @@ export default new Vuex.Store(
 
                 return maxFitness;
             },
-            getProjectName: (state) => () => state.projectName
+            getProjectName: (state) => () => {
+                return state.projectName
+            }
         },
         mutations: {
             parseJson: (state, payload) => {
                 const jsonString: string = payload.jsonString;
                 const jsonData: JSONData = JSON.parse(jsonString);
+
                 state.projectName = jsonData.projectName;
                 const variantData: VariantDatum[] = jsonData.variants;
 
@@ -81,9 +91,9 @@ export default new Vuex.Store(
                     idToVariant.set(id, parent);
 
                     for (let i = 1; i <= selectionCount; i++) {
-                        const selectedVariantId: string = id.concat(String(i));
+                        const selectedVariantId: string = sprintf('%s-%d', id, i);
                         const operations: Operation[] = [{
-                            id: id,
+                            id: (i == 1) ? id : sprintf('%s-%d', id, i - 1),
                             operationName: 'select'
                         }];
                         const variant: Variant = new Variant(selectedVariantId,
@@ -119,12 +129,12 @@ export default new Vuex.Store(
                                           const parentGenerationNumber = idToVariant.get(
                                               oldParentId)
                                                                                     .getGenerationNumber();
-                                          const generationSub = parentGenerationNumber - childGenerationNumber;
+                                          const generationSub = childGenerationNumber - parentGenerationNumber;
                                           if (generationSub === 1) {
                                               return;
                                           }
-                                          const newParentId: string = oldParentId.concat(
-                                              String(generationSub - 1));
+                                          const newParentId: string =
+                                              sprintf('%s-%d', oldParentId, generationSub - 1);
                                           variant.changeParentId(oldParentId, newParentId);
                                       });
                            });

@@ -15,21 +15,21 @@ export default class EdgeComponentBase extends Vue {
         const sourceX = this.edgeStyle.source.x;
         const width = this.edgeStyle.source.width;
 
-        return sourceX + width / 2;
+        return sourceX + width;
     }
 
     get sourceY(): number {
         const sourceY = this.edgeStyle.source.y;
         const height = this.edgeStyle.source.height;
 
-        return sourceY + height;
+        return sourceY + height * 2;
     }
 
     get targetX(): number {
         const targetX = this.edgeStyle.target.x;
         const width = this.edgeStyle.target.width;
 
-        return targetX + width / 2;
+        return targetX + width;
     }
 
     get targetY(): number {

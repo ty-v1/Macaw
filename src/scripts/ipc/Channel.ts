@@ -11,13 +11,7 @@
  *
  * */
 export class Channel {
-    public static readonly FILE_READ = "file-read";
-}
+    public static readonly FILE_READ = 'file-read';
 
-module FileRead {
-    export const CHANNEL = "file-read";
-}
-
-module FileDropped {
-    export const CHANNEL = "file-dropped";
+    public static readonly FILE_DROPPED = 'file-dropped';
 }

@@ -27,6 +27,7 @@
     import SimpleLine from "./edge/SimpleLine.vue";
     import CrossNode from "./node/CrossNode.vue";
     import CircleNode from "./node/CircleNode.vue";
+    import {Variant} from "../../scripts/data/Variant";
 
     @Component({components: {SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends NetworkComponentBase {
@@ -35,9 +36,10 @@
          *  computed
          *  */
         get buildSuccessfulNodeStyle(): NodeStyle[] {
-            const buildSuccessfulNodeStyle: NodeStyle[] = [];
+            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
 
-            this.variants.forEach((variant) => {
+            const buildSuccessfulNodeStyle: NodeStyle[] = [];
+            variants.forEach((variant) => {
                 if (variant.isBuildSuccess()) {
                     const nodeStyle = this.idToNodeStyle.get(variant.getId());
                     buildSuccessfulNodeStyle.push(nodeStyle);
@@ -47,9 +49,11 @@
         }
 
         get buildUnSuccessfulNodeStyle(): NodeStyle[] {
+
+            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
             const buildUnsuccessfulNodeStyles: NodeStyle[] = [];
 
-            this.variants.forEach((variant) => {
+            variants.forEach((variant) => {
                 if (!variant.isBuildSuccess()) {
                     const nodeStyle = this.idToNodeStyle.get(variant.getId());
                     buildUnsuccessfulNodeStyles.push(nodeStyle);
@@ -59,9 +63,11 @@
         }
 
         get edgeStyles(): EdgeStyle[] {
+
+            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
             const edgeStyles: EdgeStyle[] = [];
 
-            this.variants.forEach((variant) => {
+            variants.forEach((variant) => {
                 const targetNodeStyle = this.idToNodeStyle.get(variant.getId());
 
                 variant.getParentIds()
@@ -83,7 +89,7 @@
          * */
         private static readonly BASE_COLOR_CODES = [
             RGB.RED,
-            RGB.WIHTE,
+            RGB.WHITE,
             RGB.GREEN
         ];
 
@@ -91,21 +97,15 @@
         private static readonly NODE_HEIGHT: number = 15;
 
         private static readonly X_PADDING: number = 25;
-        private static readonly Y_PADDING: number = 75;
+        private static readonly Y_PADDING: number = 200;
 
         private idToNodeStyle: HashMap<string, NodeStyle> = new HashMap();
 
-        /**
-         * life cycle methods
-         * */
-        beforeCreate() {
-            super.beforeCreate();
-            this.applyLayout();
-        }
-
         protected applyLayout() {
+            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
+
             const nodeColorStrategy = new ThreeBasePointsGradation(
-                this.getBasePoints(), Basic.BASE_COLOR_CODES);
+                this.getBasePoints(variants), Basic.BASE_COLOR_CODES);
 
             const simpleHierarchy = new SimpleHierarchy(Basic.NODE_WIDTH,
                                                         Basic.NODE_HEIGHT,
@@ -113,17 +113,18 @@
                                                         Basic.X_PADDING,
                                                         Basic.Y_PADDING);
 
-            this.idToNodeStyle.clear();
-            this.idToNodeStyle = simpleHierarchy.exec(this.variants, this.maxGenerationNumber);
+            const maxGenerationNumber: number = this.$store.getters.getMaxGenerationNumber(this.$store.state);
+
+            this.idToNodeStyle = simpleHierarchy.exec(variants, maxGenerationNumber);
             this.width = simpleHierarchy.getWidth();
             this.height = simpleHierarchy.getHeight();
         }
 
-        private getBasePoints(): number[] {
+        private getBasePoints(variants: Variant[]): number[] {
 
             let middlePoint: number = 0.5;
 
-            this.variants.forEach((variant) => {
+            variants.forEach((variant) => {
                 if (variant.getId() === "0") {
                     middlePoint = variant.getFitness();
                 }
@@ -148,6 +149,6 @@
 
     line {
         stroke: #000000;
-        stroke-width: 5;
+        stroke-width: 2;
     }
 </style>

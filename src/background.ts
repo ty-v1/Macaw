@@ -4,6 +4,7 @@ import {
     app,
     BrowserWindow,
     dialog,
+    ipcMain,
     Menu,
     MenuItem,
     MenuItemConstructorOptions,
@@ -57,10 +58,7 @@ function createMenu(): void {
                     click(item: MenuItem, window: BrowserWindow) {
                         dialog.showOpenDialog(window, OPEN_DIALOG_OPTIONS, readFile);
                     }
-                },
-                {
-                    role: 'redo',
-                },
+                }
             ]
         },
         {
@@ -105,15 +103,6 @@ function createMenu(): void {
                                          role: 'hide'
                                      },
                                      {
-                                         role: 'hideothers'
-                                     },
-                                     {
-                                         role: 'unhide'
-                                     },
-                                     {
-                                         type: 'separator'
-                                     },
-                                     {
                                          role: 'quit'
                                      }
                                  ]
@@ -129,6 +118,12 @@ function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({width: 800, height: 600});
     createMenu();
+
+    // ドロップ時のイベント
+    ipcMain.on(Channel.FILE_DROPPED, (event: Event, arg: string) => {
+        readFile([arg], ['']);
+    });
+
 
     if (isDevelopment) {
         // Load the url of the dev server if in development mode
