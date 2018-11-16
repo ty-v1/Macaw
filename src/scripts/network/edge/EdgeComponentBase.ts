@@ -1,38 +1,29 @@
 import Component from "vue-class-component";
 import Vue from "vue";
 import {Prop} from "vue-property-decorator";
-import {EdgeStyle} from "@/scripts/data/style/EdgeStyle";
+import {NWEdge} from "@/scripts/data/network/NWEdge";
 
 @Component
 export default class EdgeComponentBase extends Vue {
     @Prop() id!: string;
-    @Prop() edgeStyle!: EdgeStyle;
+    @Prop({required:true}) edge!: NWEdge;
 
     /**
      * computed methods
      * */
     get sourceX(): number {
-        const sourceX = this.edgeStyle.source.x;
-        const width = this.edgeStyle.source.width;
-
-        return sourceX + width;
+        return this.edge.sourceX;
     }
 
     get sourceY(): number {
-        const sourceY = this.edgeStyle.source.y;
-        const height = this.edgeStyle.source.height;
-
-        return sourceY + height * 2;
+        return this.edge.sourceY;
     }
 
     get targetX(): number {
-        const targetX = this.edgeStyle.target.x;
-        const width = this.edgeStyle.target.width;
-
-        return targetX + width;
+        return this.edge.targetX;
     }
 
     get targetY(): number {
-        return this.edgeStyle.target.y;
+        return this.edge.targetY;
     }
 }

@@ -17,7 +17,7 @@ export class ThreeBasePointsGradation implements INodeColorStrategy {
 
         if (fitness < this.basePoints[0] || this.basePoints[2] < fitness) {
             return RGB.BLACK;
-        } else if (this.basePoints[0] <= fitness && fitness <= this.basePoints[1]) {
+        } else if (this.basePoints[0] <= fitness && fitness < this.basePoints[1]) {
             const ratio = ThreeBasePointsGradation.calculateRatio(
                 this.basePoints[1], this.basePoints[0], fitness);
 

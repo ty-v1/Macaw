@@ -1,6 +1,7 @@
 import {RGB} from "@/scripts/color/RGB";
 
-export type NodeStyle = {
+export type NWNode = {
+    id: string,
     x: number,
     y: number,
     color: RGB,

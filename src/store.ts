@@ -1,158 +1,19 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
-import {Variant} from '@/scripts/data/Variant';
-import HashMap from 'hashmap';
-import {VariantDatum} from '@/scripts/data/VariantDatum';
-import {JSONData} from "@/scripts/data/JSONData";
-import {Patch} from "@/scripts/data/Patch";
-import {TestSummary} from "@/scripts/data/TestSummary";
-import {Operation} from "@/scripts/data/Operation";
-import {sprintf} from "sprintf-js";
+import Vuex, {createNamespacedHelpers} from 'vuex';
+import {LayoutStore} from "./store/LayoutStore";
+import {VariantStore} from "./store/VariantStore";
+
+// ストアの設定
 
 Vue.use(Vuex);
 
-type State = {
-    idToVariant: HashMap<string, Variant>,
-    generationNumberToVariantCount: number[],
-    maxGenerationNumber: number,
-    projectName: string
-}
-
-export default new Vuex.Store(
+const store = new Vuex.Store(
     {
-        state: {
-            idToVariant: new HashMap<string, Variant>(),
-            generationNumberToVariantCount: [],
-            maxGenerationNumber: 0,
-            projectName: ""
-        } as State,
-        getters: {
-            getAllVariants: (state) => () => {
-                return state.idToVariant.values()
-            },
-            getVariant: (state) => (id: string) => {
-                return state.idToVariant.get(id)
-            },
-            getGenerationNumberToVariantCount: (state) => () => {
-                return state.generationNumberToVariantCount
-            },
-            getMaxGenerationNumber: (state) => () => {
-                return state.maxGenerationNumber
-            },
-            maxFitness: (state) => () => {
-                const variants: Variant[] = state.idToVariant.values();
-                const maxFitness: number[] = [state.maxGenerationNumber + 1].map(() => 0);
-
-                variants.forEach((variant: Variant) => {
-                    const generationNumber = variant.getGenerationNumber();
-                    const fitness = variant.getFitness();
-                    const max = maxFitness[generationNumber];
-
-                    if (max < fitness) {
-                        maxFitness[generationNumber] = fitness;
-                    }
-                });
-
-                return maxFitness;
-            },
-            getProjectName: (state) => () => {
-                return state.projectName
-            }
+        modules: {
+            VariantStore,
+            LayoutStore
         },
-        mutations: {
-            parseJson: (state, payload) => {
-                const jsonString: string = payload.jsonString;
-                const jsonData: JSONData = JSON.parse(jsonString);
+    });
 
-                state.projectName = jsonData.projectName;
-                const variantData: VariantDatum[] = jsonData.variants;
+export default store;
 
-                // コピー(選択)の解決をする
-                const idToVariant: HashMap<string, Variant> = new HashMap<string, Variant>();
-                let maxGenerationNumber = 0;
-                variantData.forEach((variantDatum) => {
-                    const id: string = variantDatum.id;
-                    const selectionCount: number = variantDatum.selectionCount;
-                    const patches: Patch[] = variantDatum.patches;
-                    const fitness: number = variantDatum.fitness;
-                    const buildSuccess: boolean = variantDatum.isBuildSuccess;
-                    const generationNumber: number = variantDatum.generationNumber;
-                    const testSummary: TestSummary = variantDatum.testSummary;
-                    const operations: Operation[] = variantDatum.operations;
-                    // 親のVariantを追加する
-                    const parent: Variant = new Variant(id,
-                                                        generationNumber,
-                                                        fitness,
-                                                        buildSuccess,
-                                                        selectionCount,
-                                                        patches,
-                                                        operations,
-                                                        testSummary);
-                    idToVariant.set(id, parent);
-
-                    for (let i = 1; i <= selectionCount; i++) {
-                        const selectedVariantId: string = sprintf('%s-%d', id, i);
-                        const operations: Operation[] = [{
-                            id: (i == 1) ? id : sprintf('%s-%d', id, i - 1),
-                            operationName: 'select'
-                        }];
-                        const variant: Variant = new Variant(selectedVariantId,
-                                                             generationNumber + i,
-                                                             fitness,
-                                                             buildSuccess,
-                                                             selectionCount,
-                                                             patches,
-                                                             operations,
-                                                             testSummary,
-                                                             true);
-                        idToVariant.set(selectedVariantId, variant);
-                    }
-
-                    if (maxGenerationNumber < generationNumber) {
-                        maxGenerationNumber = generationNumber;
-                    }
-                });
-                state.maxGenerationNumber = maxGenerationNumber;
-
-                // 選択されたVariantの子の親IDを書き換える
-                idToVariant.values()
-                           .forEach((variant) => {
-
-                               if (variant.isSelected()) {
-                                   return;
-                               }
-
-                               const childGenerationNumber = variant.getGenerationNumber();
-
-                               variant.getParentIds()
-                                      .forEach((oldParentId) => {
-                                          const parentGenerationNumber = idToVariant.get(
-                                              oldParentId)
-                                                                                    .getGenerationNumber();
-                                          const generationSub = childGenerationNumber - parentGenerationNumber;
-                                          if (generationSub === 1) {
-                                              return;
-                                          }
-                                          const newParentId: string =
-                                              sprintf('%s-%d', oldParentId, generationSub - 1);
-                                          variant.changeParentId(oldParentId, newParentId);
-                                      });
-                           });
-
-                state.idToVariant = idToVariant;
-
-                // 世代ごとのvariantの数を求める
-                const generationNumberToVariantCount
-                    = new Array(maxGenerationNumber + 1);
-                generationNumberToVariantCount.fill(0);
-
-                idToVariant.values()
-                           .forEach((variant) => {
-                               generationNumberToVariantCount[variant.getGenerationNumber()]++;
-                           });
-
-                state.generationNumberToVariantCount = generationNumberToVariantCount;
-            }
-        },
-        actions: {}
-    })

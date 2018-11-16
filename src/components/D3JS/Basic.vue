@@ -1,89 +1,35 @@
 <template>
-    <svg :width="width" :height="height">
-        <SimpleLine v-for="edgeStyle in edgeStyles"
-                    :edge-style="edgeStyle">
+    <svg :width="SVGWidth" :height="SVGHeight">
+        <SimpleLine v-for="edge in simpleLine"
+                    :edge="edge">
         </SimpleLine>
 
-        <CircleNode v-for="nodeStyle in buildSuccessfulNodeStyle"
-                    :node-style="nodeStyle">
+        <CircleNode v-for="node in circleNode"
+                    :node="node">
         </CircleNode>
 
-        <CrossNode v-for="nodeStyle in buildUnSuccessfulNodeStyle"
-                   :node-style="nodeStyle">
+        <CrossNode v-for="node in crossNode"
+                   :node="node">
         </CrossNode>
     </svg>
 </template>
 
 <script lang="ts">
-    import {Component} from 'vue-property-decorator';
-    import NetworkComponentBase from "../../scripts/network/NetworkComponentBase";
+    import Component from 'vue-class-component';
     import {ThreeBasePointsGradation} from "../../scripts/network/node/strategy/color/ThreeBasePointsGradation";
     import {RGB} from "../../scripts/color/RGB";
-    import {SimpleHierarchy} from "../../scripts/network/layout/SimpleHierarchy";
-    import HashMap from "hashmap";
-    import {NodeStyle} from "../../scripts/data/style/NodeStyle";
-    import {EdgeStyle} from "../../scripts/data/style/EdgeStyle";
-    // vue component
+    import {NWEdge} from "../../scripts/data/network/NWEdge";
+    import Vue from "vue";
+    import {NWNode} from "../../scripts/data/network/NWNode";
     import SimpleLine from "./edge/SimpleLine.vue";
     import CrossNode from "./node/CrossNode.vue";
     import CircleNode from "./node/CircleNode.vue";
     import {Variant} from "../../scripts/data/Variant";
+    import {NoAlignmentHierarchy} from "../../scripts/network/layout/NoAlignmentHierarchy";
+
 
     @Component({components: {SimpleLine, CrossNode, CircleNode}})
-    export default class Basic extends NetworkComponentBase {
-
-        /**
-         *  computed
-         *  */
-        get buildSuccessfulNodeStyle(): NodeStyle[] {
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
-
-            const buildSuccessfulNodeStyle: NodeStyle[] = [];
-            variants.forEach((variant) => {
-                if (variant.isBuildSuccess()) {
-                    const nodeStyle = this.idToNodeStyle.get(variant.getId());
-                    buildSuccessfulNodeStyle.push(nodeStyle);
-                }
-            });
-            return buildSuccessfulNodeStyle;
-        }
-
-        get buildUnSuccessfulNodeStyle(): NodeStyle[] {
-
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
-            const buildUnsuccessfulNodeStyles: NodeStyle[] = [];
-
-            variants.forEach((variant) => {
-                if (!variant.isBuildSuccess()) {
-                    const nodeStyle = this.idToNodeStyle.get(variant.getId());
-                    buildUnsuccessfulNodeStyles.push(nodeStyle);
-                }
-            });
-            return buildUnsuccessfulNodeStyles;
-        }
-
-        get edgeStyles(): EdgeStyle[] {
-
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
-            const edgeStyles: EdgeStyle[] = [];
-
-            variants.forEach((variant) => {
-                const targetNodeStyle = this.idToNodeStyle.get(variant.getId());
-
-                variant.getParentIds()
-                       .forEach((parentId) => {
-                           const sourceNodeStyle = this.idToNodeStyle.get(parentId);
-                           const edgeStyle: EdgeStyle = {
-                               color: RGB.BLACK,
-                               source: sourceNodeStyle,
-                               target: targetNodeStyle
-                           };
-                           edgeStyles.push(edgeStyle);
-                       });
-            });
-            return edgeStyles;
-        }
-
+    export default class Basic extends Vue {
         /**
          * data
          * */
@@ -99,36 +45,95 @@
         private static readonly X_PADDING: number = 25;
         private static readonly Y_PADDING: number = 200;
 
-        private idToNodeStyle: HashMap<string, NodeStyle> = new HashMap();
-
-        protected applyLayout() {
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
-
-            const nodeColorStrategy = new ThreeBasePointsGradation(
-                this.getBasePoints(variants), Basic.BASE_COLOR_CODES);
-
-            const simpleHierarchy = new SimpleHierarchy(Basic.NODE_WIDTH,
-                                                        Basic.NODE_HEIGHT,
-                                                        nodeColorStrategy,
-                                                        Basic.X_PADDING,
-                                                        Basic.Y_PADDING);
-
-            const maxGenerationNumber: number = this.$store.getters.getMaxGenerationNumber(this.$store.state);
-
-            this.idToNodeStyle = simpleHierarchy.exec(variants, maxGenerationNumber);
-            this.width = simpleHierarchy.getWidth();
-            this.height = simpleHierarchy.getHeight();
-        }
-
-        private getBasePoints(variants: Variant[]): number[] {
-
-            let middlePoint: number = 0.5;
+        /**
+         *  computed
+         *  */
+        get circleNode(): NWNode[] {
+            const variants = this.$store.getters['VariantStore/buildSucceededVariant'];
+            const nodes: NWNode[] = [];
 
             variants.forEach((variant) => {
-                if (variant.getId() === "0") {
-                    middlePoint = variant.getFitness();
-                }
+                const result = this.$store.getters['LayoutStore/node'](variant);
+                Array.prototype.push.apply(nodes, result);
             });
+
+            // console.log('circle');
+            // console.log(nodes);
+            return nodes;
+        }
+
+        get crossNode(): NWNode[] {
+            const variants = this.$store.getters['VariantStore/buildFailedVariant'];
+            const nodes: NWNode[] = [];
+
+            variants.forEach((variant) => {
+                const result = this.$store.getters['LayoutStore/node'](variant);
+                Array.prototype.push.apply(nodes, result);
+            });
+            // console.log('cross');
+            // console.log(nodes);
+            return nodes;
+        }
+
+        get simpleLine(): NWEdge[] {
+            const variants = this.$store.getters['VariantStore/variants'];
+            const edges: NWEdge[] = [];
+
+            return this.$store.getters['LayoutStore/edge'](null);
+            // variants.forEach((variant) => {
+            //     const result = this.$store.getters['LayoutStore/edge'](variant);
+            //
+            //
+            //     Array.prototype.push.apply(edges, result);
+            // });
+            //
+            // console.log('line');
+            // console.log(edges);
+            //
+            // return edges;
+        }
+
+        get SVGWidth() {
+            // console.log('w');
+            // console.log(this.$store.getters['VariantStore/SVGWidth']);
+            return this.$store.getters['LayoutStore/SVGWidth'];
+        }
+
+        get SVGHeight() {
+            // console.log('h');
+            // console.log(this.$store.getters['VariantStore/SVGWidth']);
+            return this.$store.getters['LayoutStore/SVGHeight'];
+        }
+
+        /**
+         * life cycle
+         * */
+        created() {
+            const basePoints = this.getBasePoints();
+
+            const nodeColorStrategy
+                = new ThreeBasePointsGradation(basePoints, Basic.BASE_COLOR_CODES);
+
+            const simpleHierarchy = new NoAlignmentHierarchy(Basic.NODE_WIDTH,
+                                                             Basic.NODE_HEIGHT,
+                                                             nodeColorStrategy,
+                                                             Basic.X_PADDING,
+                                                             Basic.Y_PADDING);
+            this.$store.commit('LayoutStore/createLayout',
+                               {
+                                   layoutStrategy: simpleHierarchy,
+                                   variants: this.$store.getters['VariantStore/variants'],
+                                   maxGenerationNumber: this.$store.getters['VariantStore/maxGenerationNumber'],
+                                   generationNumberToVariantCount: this.$store.getters['VariantStore/generationNumberToVariantCount']
+                               });
+        }
+
+        private getBasePoints(): number[] {
+            const initialVariant: Variant = this.$store.getters['VariantStore/initialVariant'];
+            const middlePoint: number =
+                (initialVariant !== null && initialVariant !== undefined) ?
+                    initialVariant.getFitness() : 0.5;
+
             return [0.0, middlePoint, 1.0];
         }
     }
@@ -149,6 +154,6 @@
 
     line {
         stroke: #000000;
-        stroke-width: 2;
+        stroke-width: 1;
     }
 </style>
