@@ -7,15 +7,17 @@
         <div id="nav">
             <router-link to="/">Network Graph</router-link>
             |
-            <router-link to="/about">Bar Graph</router-link>
+            <router-link to="/about">Line Graph</router-link>
         </div>
         <router-view/>
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+    import {Component} from 'vue-property-decorator';
+    import Vue from "vue";
 
+    // ストアのアクセスだけここにかく
     @Component
     export default class App extends Vue {
         /**
@@ -39,19 +41,27 @@
         onDrop(event: DragEvent) {
             event.preventDefault();
 
+            // ファイルを読み込んでレイアウトの適応
             if (event.dataTransfer !== null && event.dataTransfer.files[0] !== null) {
                 const file: File = event.dataTransfer.files[0];
-                const reader: FileReader = new FileReader();
-                // ファイル読み込みに成功したときの処理
-                reader.onload = () => {
-                    const result = reader.result;
 
-                    if (result !== null) {
-                        const jsonString = result.toString();
-                        this.$store.commit('parseJson', {jsonString: jsonString});
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (reader.result !== null) {
+                        this.$store.commit('VariantStore/setVariants',
+                                           {jsonString: reader.result.toString()});
+
+                        this.$store.commit('LayoutStore/apply',
+                                           {
+                                               variants:
+                                                   this.$store.getters['VariantStore/variants'],
+                                               maxGenerationNumber:
+                                                   this.$store.getters['VariantStore/maxGenerationNumber'],
+                                               generationNumberToVariantCount:
+                                                   this.$store.getters['VariantStore/generationNumberToVariantCount']
+                                           });
                     }
                 };
-                // ファイル読み込みを実行
                 reader.readAsText(file);
             }
             return false;

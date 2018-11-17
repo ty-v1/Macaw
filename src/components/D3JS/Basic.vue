@@ -1,135 +1,100 @@
 <template>
-    <svg :width="width" :height="height">
-        <SimpleLine v-for="edgeStyle in edgeStyles"
-                    :edge-style="edgeStyle">
-        </SimpleLine>
+    <svg :width="SVGWidth" :height="SVGHeight">
+        <g transform="translate(20, 20)">
+            <SimpleLine v-for="edge in simpleLine"
+                        :edge="edge">
+            </SimpleLine>
 
-        <CircleNode v-for="nodeStyle in buildSuccessfulNodeStyle"
-                    :node-style="nodeStyle">
-        </CircleNode>
+            <CircleNode v-for="node in circleNode"
+                        :node="node">
+            </CircleNode>
 
-        <CrossNode v-for="nodeStyle in buildUnSuccessfulNodeStyle"
-                   :node-style="nodeStyle">
-        </CrossNode>
+            <CrossNode v-for="node in crossNode"
+                       :node="node">
+            </CrossNode>
+        </g>
     </svg>
 </template>
 
 <script lang="ts">
-    import {Component} from 'vue-property-decorator';
-    import NetworkComponentBase from "../../scripts/network/NetworkComponentBase";
-    import {ThreeBasePointsGradation} from "../../scripts/network/node/strategy/color/ThreeBasePointsGradation";
-    import {RGB} from "../../scripts/color/RGB";
-    import {SimpleHierarchy} from "../../scripts/network/layout/SimpleHierarchy";
-    import HashMap from "hashmap";
-    import {NodeStyle} from "../../scripts/data/style/NodeStyle";
-    import {EdgeStyle} from "../../scripts/data/style/EdgeStyle";
-    // vue component
+    import {Component, Vue} from 'vue-property-decorator';
+    import {Color} from "../../scripts/color/Color";
+    import {GraphEdge} from "../../scripts/data/network/GraphEdge";
+    import {GraphNode} from "../../scripts/data/network/GraphNode";
     import SimpleLine from "./edge/SimpleLine.vue";
     import CrossNode from "./node/CrossNode.vue";
     import CircleNode from "./node/CircleNode.vue";
+    import {ThreeBasePointsGradation} from "../../scripts/network/node/strategy/color/ThreeBasePointsGradation";
+    import {NoAlignHierarchy} from "../../scripts/network/node/strategy/position/NoAlignHierarchy";
+    import {FixedNodeSize} from "../../scripts/network/node/strategy/size/FixedNodeSize";
+    import {FitnessBasedNodeShape} from "../../scripts/network/node/strategy/shape/FitnessBasedNodeShape";
     import {Variant} from "../../scripts/data/Variant";
 
     @Component({components: {SimpleLine, CrossNode, CircleNode}})
-    export default class Basic extends NetworkComponentBase {
-
-        /**
-         *  computed
-         *  */
-        get buildSuccessfulNodeStyle(): NodeStyle[] {
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
-
-            const buildSuccessfulNodeStyle: NodeStyle[] = [];
-            variants.forEach((variant) => {
-                if (variant.isBuildSuccess()) {
-                    const nodeStyle = this.idToNodeStyle.get(variant.getId());
-                    buildSuccessfulNodeStyle.push(nodeStyle);
-                }
-            });
-            return buildSuccessfulNodeStyle;
-        }
-
-        get buildUnSuccessfulNodeStyle(): NodeStyle[] {
-
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
-            const buildUnsuccessfulNodeStyles: NodeStyle[] = [];
-
-            variants.forEach((variant) => {
-                if (!variant.isBuildSuccess()) {
-                    const nodeStyle = this.idToNodeStyle.get(variant.getId());
-                    buildUnsuccessfulNodeStyles.push(nodeStyle);
-                }
-            });
-            return buildUnsuccessfulNodeStyles;
-        }
-
-        get edgeStyles(): EdgeStyle[] {
-
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
-            const edgeStyles: EdgeStyle[] = [];
-
-            variants.forEach((variant) => {
-                const targetNodeStyle = this.idToNodeStyle.get(variant.getId());
-
-                variant.getParentIds()
-                       .forEach((parentId) => {
-                           const sourceNodeStyle = this.idToNodeStyle.get(parentId);
-                           const edgeStyle: EdgeStyle = {
-                               color: RGB.BLACK,
-                               source: sourceNodeStyle,
-                               target: targetNodeStyle
-                           };
-                           edgeStyles.push(edgeStyle);
-                       });
-            });
-            return edgeStyles;
-        }
-
+    export default class Basic extends Vue {
         /**
          * data
          * */
         private static readonly BASE_COLOR_CODES = [
-            RGB.RED,
-            RGB.WHITE,
-            RGB.GREEN
+            Color.RED,
+            Color.WHITE,
+            Color.GREEN
         ];
 
-        private static readonly NODE_WIDTH: number = 15;
-        private static readonly NODE_HEIGHT: number = 15;
+        /**
+         *  computed
+         *  */
+        get circleNode(): GraphNode[] {
+            const filter = (node: GraphNode) => node.shape === 'circle';
 
-        private static readonly X_PADDING: number = 25;
-        private static readonly Y_PADDING: number = 200;
-
-        private idToNodeStyle: HashMap<string, NodeStyle> = new HashMap();
-
-        protected applyLayout() {
-            const variants: Variant[] = this.$store.getters.getAllVariants(this.$store.state);
-
-            const nodeColorStrategy = new ThreeBasePointsGradation(
-                this.getBasePoints(variants), Basic.BASE_COLOR_CODES);
-
-            const simpleHierarchy = new SimpleHierarchy(Basic.NODE_WIDTH,
-                                                        Basic.NODE_HEIGHT,
-                                                        nodeColorStrategy,
-                                                        Basic.X_PADDING,
-                                                        Basic.Y_PADDING);
-
-            const maxGenerationNumber: number = this.$store.getters.getMaxGenerationNumber(this.$store.state);
-
-            this.idToNodeStyle = simpleHierarchy.exec(variants, maxGenerationNumber);
-            this.width = simpleHierarchy.getWidth();
-            this.height = simpleHierarchy.getHeight();
+            return this.$store.getters['LayoutStore/filteredNodes'](filter);
         }
 
-        private getBasePoints(variants: Variant[]): number[] {
+        get crossNode(): GraphNode[] {
+            const filter = (node: GraphNode) => node.shape === 'cross';
 
-            let middlePoint: number = 0.5;
+            return this.$store.getters['LayoutStore/filteredNodes'](filter);
+        }
 
-            variants.forEach((variant) => {
-                if (variant.getId() === "0") {
-                    middlePoint = variant.getFitness();
+        get simpleLine(): GraphEdge[] {
+            return this.$store.getters['LayoutStore/allEdges'];
+        }
+
+        get SVGWidth() {
+            return this.$store.getters['LayoutStore/svgWidth'];
+        }
+
+        get SVGHeight() {
+            return this.$store.getters['LayoutStore/svgHeight'];
+        }
+
+        /**
+         * life cycle
+         * */
+        created() {
+            const midCalculator = (variants: Variant[]) => {
+                for (let i = 0; i < variants.length; i++) {
+                    if (variants[i].getId() === "0") {
+                        return variants[i].getFitness();
+                    }
                 }
-            });
-            return [0.0, middlePoint, 1.0];
+                return 0.5;
+            };
+
+            this.$store.commit('LayoutStore/setNodeColorStrategy',
+                               {
+                                   nodeColorStrategy: new ThreeBasePointsGradation(Basic.BASE_COLOR_CODES,
+                                                                                   midCalculator)
+                               });
+
+            this.$store.commit('LayoutStore/setNodePositionStrategy',
+                               {nodePositionStrategy: new NoAlignHierarchy()});
+
+            this.$store.commit('LayoutStore/setNodeSizeStrategy',
+                               {nodeSizeStrategy: new FixedNodeSize(15, 15)});
+
+            this.$store.commit('LayoutStore/setNodeShapeStrategy',
+                               {nodeShapeStrategy: new FitnessBasedNodeShape()});
         }
     }
 </script>
@@ -149,6 +114,6 @@
 
     line {
         stroke: #000000;
-        stroke-width: 2;
+        stroke-width: 1;
     }
 </style>

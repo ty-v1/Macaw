@@ -1,23 +1,23 @@
 import Vue from "vue";
 import {Component, Prop} from "vue-property-decorator";
 import {sprintf} from "sprintf-js";
-import {NodeStyle} from "@/scripts/data/style/NodeStyle";
+import {GraphNode} from "@/scripts/data/network/GraphNode";
 
 @Component
 export default class NodeComponentBase extends Vue {
     @Prop() id!: string;
-    @Prop() nodeStyle!: NodeStyle;
+    @Prop() node!: GraphNode;
 
     get transform(): string {
-        const x: number = this.nodeStyle.x;
-        const y: number = this.nodeStyle.y;
-        const width: number = this.nodeStyle.width;
-        const height: number = this.nodeStyle.height;
+        const x: number = this.node.x;
+        const y: number = this.node.y;
+        const width: number = this.node.width;
+        const height: number = this.node.height;
 
         return sprintf("translate(%d, %d)scale(%d, %d)", x, y, width, height);
     }
 
     get color(): string {
-        return this.nodeStyle.color.toString();
+        return this.node.color.toString();
     }
 }
