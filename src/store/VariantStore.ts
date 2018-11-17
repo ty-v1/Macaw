@@ -14,26 +14,6 @@ export interface VariantStoreState {
     projectName: string
 }
 
-export interface VariantStoreGetters {
-    variants: () => Variant[],
-    maxGenerationNumber: () => number,
-    projectName: () => string,
-    generationNumberToVariantCount: () => number[],
-    generationNumberToFitnessStatistics: () => Statistics[],
-    initialVariant: () => Variant,
-    buildSucceededVariant: () => Variant[],
-    buildFailedVariant: () => Variant[],
-}
-
-export interface VariantStoreMutations {
-    setVariants: { jsonString: string }
-}
-
-export interface VariantStoreActions {
-    readFile: { file: File },
-    parseJson: { file: File },
-}
-
 const state: VariantStoreState = {
     idToVariant: new HashMap<string, Variant>(),
     maxGenerationNumber: 0,
@@ -223,37 +203,7 @@ function changeSelectVariantParentId(idToVariant: HashMap<string, Variant>) {
                });
 }
 
-const actions = {
-
-    parseJson: ({dispatch, commit}, payload) => {
-        return new Promise<string>((resolve: (value?: string) => void, reject) => {
-            dispatch('readFile', {file: payload.file})
-                .then((result) => {
-                    // jsonのパースをする
-                    commit({
-                               type: 'setVariants',
-                               jsonString: result
-                           });
-                    resolve();
-                });
-        });
-    },
-
-    readFile: ({commit}, payload) => {
-        return new Promise<string>((resolve: (value?: string) => void, reject) => {
-            // ローカルにあるファイルを読み込む
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (reader.result !== null) {
-                    resolve(reader.result.toString());
-                } else {
-                    reject();
-                }
-            };
-            reader.readAsText(payload.file);
-        });
-    },
-};
+const actions = {};
 
 export const VariantStore = {
     namespaced: true,

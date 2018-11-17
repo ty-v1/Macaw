@@ -1,227 +1,65 @@
-import {NWEdge} from "@/scripts/data/network/NWEdge";
-import {ILayoutStrategy} from "@/scripts/network/layout/ILayoutStrategy";
-import {NWNode} from "@/scripts/data/network/NWNode";
-import HashMap from "hashmap";
-import {DefaultLayout} from "@/scripts/network/layout/DefaultLayout";
+import {GraphNode} from "@/scripts/data/network/GraphNode";
+import {Layout} from "@/scripts/data/network/Layout";
+import {LayoutFactory} from "@/scripts/network/layout/LayoutFactory";
+import {DefaultNodeColor} from "@/scripts/network/node/strategy/color/DefaultNodeColor";
+import {DefaultNodePosition} from "@/scripts/network/node/strategy/position/DefaultNodePosition";
+import {DefaultNodeSize} from "@/scripts/network/node/strategy/size/DefaultNodeSize";
+import {DefaultNodeShape} from "@/scripts/network/node/strategy/shape/DefaultNodeShape";
 
 export interface LayoutStoreState {
-    layoutStrategy: ILayoutStrategy,
-    nodeCache: HashMap<string, NWNode>,
-    edgeCache: HashMap<string, NWEdge>,
-    SVGWidth: number,
-    SVGHeight: number
+    layoutStrategy: LayoutFactory,
+    layout: Layout
 }
 
 const state: LayoutStoreState = {
-    layoutStrategy: new DefaultLayout(),
-    nodeCache: new HashMap<string, NWNode>(),
-    edgeCache: new HashMap<string, NWEdge>(),
-    SVGWidth: 0,
-    SVGHeight: 0
+    layoutStrategy: new LayoutFactory(
+        new DefaultNodeColor(),
+        new DefaultNodePosition(),
+        new DefaultNodeSize(),
+        new DefaultNodeShape()
+    ),
+    layout: null,
 };
 
-
 const getters = {
+    allNodes: state => (state.layout !== null) ? state.layout.nodes.values() : [],
 
-    node: state => variant => {
+    allEdges: state => (state.layout !== null) ? state.layout.edges.values() : [],
 
-        console.log('node');
-        return [state.nodeCache.get(variant.getId())];
-        // // } else {
-        //     return state.layoutStrategy.locateNodes(variant);
-        // }
-    },
+    filteredNodes: state =>
+        (filter: (node: GraphNode) => boolean) =>
+            (state.layout !== null) ? state.layout.nodes.filter(filter) : [],
 
-    edge: state => variant => {
+    svgHeight: state => (state.layout !== null) ? state.layout.height : 0,
 
-        console.log('edge');
-        return state.edgeCache.values();
-        // if (state.layoutStrategy.needsCachingEdge()) {
-        // return [state.edgeCache.get(variant.getId())];
-        // } else {
-        //     return state.layoutStrategy.locateEdges(variant, state.nodeCache);
-        // }
-    },
-    SVGHeight: state => state.SVGHeight,
-
-    SVGWidth: state => state.SVGWidth
+    svgWidth: state => (state.layout !== null) ? state.layout.width : 0
 };
 
 const mutations = {
-    setStrategy: (state, payload) => {
-        _setStrategy(state, payload);
-    },
 
-    createEdgeCache: (state, payload) => {
-        // _createEdgeCache(state, payload);
-    },
+    setNodeColorStrategy: (state, payload) =>
+        state.layoutStrategy.setNodeColorStrategy(payload.nodeColorStrategy),
 
-    createNodeCache: (state, payload) => {
-        // _createNodeCache(state, payload);
-    },
+    setNodePositionStrategy: (state, payload) =>
+        state.layoutStrategy.setNodePositionStrategy(payload.nodePositionStrategy),
 
-    calculateSVGWidth: (state, payload) => {
-        _calculateSVGWidth(state, payload);
-    },
+    setNodeSizeStrategy: (state, payload) =>
+        state.layoutStrategy.setNodeSizeStrategy(payload.nodeSizeStrategy),
 
-    calculateSVGHeight: (state, payload) => {
-        _calculateSVGHeight(state, payload);
-    },
+    setNodeShapeStrategy: (state, payload) =>
+        state.layoutStrategy.setNodeShapeStrategy(payload.nodeShapeStrategy),
 
-    createLayout: (state, payload) => {
-        _createLayout(state, payload);
+    apply: (state, payload) => {
+        state.layout = state.layoutStrategy
+                            .exec(payload.variants,
+                                  payload.maxGenerationNumber,
+                                  payload.generationNumberToVariantCount,
+                                  30,
+                                  20);
     },
-
-    // レイアウトを再適用する
-    applyLayout: (state, payload) => {
-        _applyLayout(state, payload);
-    },
-
 };
 
-// mutationで使うサブルーチン
-function _setStrategy(state: LayoutStoreState, payload) {
-    state.layoutStrategy = payload.layoutStrategy;
-}
-
-function _createNWCache(state: LayoutStoreState, payload) {
-    const result = state.layoutStrategy.createNWCache(
-        payload.variants,
-        payload.maxGenerationNumber,
-        payload.generationNumberToVariantCount
-    );
-
-    state.edgeCache = result.edgeCache;
-
-    console.log('edgeC');
-    console.log(result.edgeCache);
-
-    state.nodeCache = result.nodeCache;
-}
-
-function _createEdgeCache(state: LayoutStoreState, payload) {
-    // if (state.layoutStrategy.needsCachingEdge()) {
-    //     state.edgeCache =
-    //         state.layoutStrategy.createEdgeCache(
-    //             payload.variants,
-    //             payload.maxGenerationNumber,
-    //             payload.generationNumberToVariantCount
-    //         );
-    // } else {
-    //     state.edgeCache.clear();
-    // }
-}
-
-function _createNodeCache(state: LayoutStoreState, payload) {
-    // if (state.layoutStrategy.needsCachingNode()) {
-    //     state.nodeCache =
-    //         state.layoutStrategy.createNodeCache(
-    //             payload.variants,
-    //             payload.maxGenerationNumber,
-    //             payload.generationNumberToVariantCount
-    //         );
-    //     console.log('t');
-    //
-    //     console.log(state.nodeCache.count());
-    // } else {
-    //     console.log('f');
-    //     state.nodeCache.clear();
-    // }
-}
-
-function _calculateSVGWidth(state: LayoutStoreState, payload) {
-    state.SVGWidth = state.layoutStrategy.getSVGWidth(
-        payload.variants,
-        payload.maxGenerationNumber,
-        payload.generationNumberToVariantCount
-    );
-}
-
-function _calculateSVGHeight(state: LayoutStoreState, payload) {
-    state.SVGHeight = state.layoutStrategy.getSVGHeight(
-        payload.variants,
-        payload.maxGenerationNumber,
-        payload.generationNumberToVariantCount
-    );
-}
-
-function _createLayout(state, payload) {
-    // ストラテジーをセットする
-    _setStrategy(state, payload);
-
-    // レイアウトの適用
-    _applyLayout(state, payload);
-}
-
-function _applyLayout(state, payload) {
-    // ノード・エッジの位置を計算する
-    // _createNodeCache(state, payload);
-    //
-    // _createEdgeCache(state, payload);
-
-    _createNWCache(state, payload);
-
-    // SVG領域の大きさを計算する
-    _calculateSVGHeight(state, payload);
-
-    _calculateSVGWidth(state, payload);
-}
-
-const actions = {
-    //
-    // createLayout: ({dispatch, commit}, payload) => {
-    //     // ストラテジーをセットする
-    //     commit({
-    //                type: 'setStrategy',
-    //                layoutStrategy: payload.layoutStrategy
-    //            });
-    //
-    //     // レイアウトの適用
-    //     dispatch('applyLayout', {
-    //         variants: payload.variants,
-    //         maxGenerationNumber: payload.maxGenerationNumber,
-    //         generationNumberToVariantCount: payload.generationNumberToVariantCount
-    //     })
-    //         .then();
-    // },
-    //
-    // // レイアウトを再適用する
-    // applyLayout: ({dispatch, commit}, payload) => {
-    //     // ノード・エッジの位置を計算する
-    //     commit({
-    //                type: 'createNodeCache',
-    //                variants: payload.variants,
-    //                maxGenerationNumber: payload.maxGenerationNumber,
-    //                generationNumberToVariantCount: payload.generationNumberToVariantCount
-    //            });
-    //
-    //     commit({
-    //                type: 'createEdgeCache',
-    //                variants: payload.variants,
-    //                maxGenerationNumber: payload.maxGenerationNumber,
-    //                generationNumberToVariantCount: payload.generationNumberToVariantCount
-    //            });
-    //
-    //     // SVG領域の大きさを計算する
-    //     commit({
-    //                type: 'calculateSVGWidth',
-    //                variants: payload.variants,
-    //                maxGenerationNumber: payload.maxGenerationNumber,
-    //                generationNumberToVariantCount: payload.generationNumberToVariantCount
-    //            });
-    //
-    //     commit({
-    //                type: 'calculateSVGHeight',
-    //                variants: payload.variants,
-    //                maxGenerationNumber: payload.maxGenerationNumber,
-    //                generationNumberToVariantCount: payload.generationNumberToVariantCount
-    //            });
-    // },
-
-
-};
-
-// export =
+const actions = {};
 
 export const LayoutStore = {
     namespaced: true,
