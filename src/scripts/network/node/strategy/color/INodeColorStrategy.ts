@@ -1,6 +1,9 @@
 import {Variant} from "@/scripts/data/Variant";
-import {RGB} from "@/scripts/color/RGB";
+import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 
 export interface INodeColorStrategy {
-    createNodeColor(variant: Variant): RGB;
+
+    exec(variants: Variant[],
+         maxGenerationNumber: number,
+         nodes: GraphNodeSet): void;
 }

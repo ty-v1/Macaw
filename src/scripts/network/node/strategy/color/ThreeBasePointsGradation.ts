@@ -1,71 +1,48 @@
-import {RGB} from "@/scripts/color/RGB";
+import {Color} from "@/scripts/color/Color";
 import {INodeColorStrategy} from "@/scripts/network/node/strategy/color/INodeColorStrategy";
 import {Variant} from "@/scripts/data/Variant";
+import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 
 export class ThreeBasePointsGradation implements INodeColorStrategy {
 
-    private readonly basePoints: number[];
-    private readonly basePointColors: RGB[];
+    private readonly basePointColors: Color[];
+    private readonly midPointCreator: (variants: Variant[]) => number;
 
-    public constructor(basePoints: number[], basePointColors: RGB[]) {
-        this.basePoints = basePoints;
+    public constructor(basePointColors: Color[],
+                       midPointCreator: (variants: Variant[]) => number) {
         this.basePointColors = basePointColors;
+        this.midPointCreator = midPointCreator;
     }
 
-    createNodeColor(variant: Variant): RGB {
+    exec(variants: Variant[],
+         maxGenerationNumber: number,
+         nodes: GraphNodeSet): void {
+        // midPointの計算
+        const midPoint = this.midPointCreator(variants);
+
+        // 色を変更
+        variants.forEach((variant) => {
+            const node = nodes.get(variant.getId());
+            node.color = this.createNodeColor(variant, midPoint);
+        });
+    }
+
+    private createNodeColor(variant: Variant, midPoint: number): Color {
         const fitness: number = variant.getFitness();
 
-        if (fitness < this.basePoints[0] || this.basePoints[2] < fitness) {
-            return RGB.BLACK;
-        } else if (this.basePoints[0] <= fitness && fitness < this.basePoints[1]) {
-            const ratio = ThreeBasePointsGradation.calculateRatio(
-                this.basePoints[1], this.basePoints[0], fitness);
+        if (fitness < 0.0 || 1.0 < fitness) {
 
-            return ThreeBasePointsGradation.calculateMiddleColorCode(
-                this.basePointColors[0], this.basePointColors[1], ratio);
-        } else if (this.basePoints[1] <= fitness && fitness <= this.basePoints[2]) {
-            const ratio = ThreeBasePointsGradation.calculateRatio(
-                this.basePoints[2], this.basePoints[1], fitness);
+            return Color.BLACK;
+        } else if (0.0 <= fitness && fitness < midPoint) {
+            const ratio = fitness / midPoint;
 
-            return ThreeBasePointsGradation.calculateMiddleColorCode(
-                this.basePointColors[1], this.basePointColors[2], ratio);
+            return this.basePointColors[0].createMiddleColor(this.basePointColors[1], ratio);
+        } else if (midPoint <= fitness && fitness <= 1.0) {
+            const ratio = (fitness - midPoint) / (1.0 - midPoint);
+
+            return this.basePointColors[1].createMiddleColor(this.basePointColors[2], ratio);
         } else {
-            return RGB.BLACK;
+            return Color.BLACK;
         }
     }
-
-    // TODO あとでRGBに写す
-    private static calculateMiddleColorCode(baseColorCode: RGB, objectiveColorCode: RGB, ratio: number) {
-
-        const middleRed: number =
-            Math.floor((objectiveColorCode.getR() - baseColorCode.getR()) * ratio + baseColorCode.getR());
-
-        const middleBlue: number =
-            Math.floor((objectiveColorCode.getB() - baseColorCode.getB()) * ratio + baseColorCode.getB());
-
-        const middleGreen: number =
-            Math.floor((objectiveColorCode.getG() - baseColorCode.getG()) * ratio + baseColorCode.getG());
-
-        const middleRedCode = this.convertColorCode(middleRed);
-        const middleGreenCode = this.convertColorCode(middleGreen);
-        const middleBlueCode = this.convertColorCode(middleBlue);
-
-        return new RGB(middleRedCode, middleGreenCode, middleBlueCode);
-    }
-
-    private static calculateRatio(max: number, min: number, x: number): number {
-        return (x - min) / (max - min);
-    }
-
-    // TODO あとでRGBに写す
-    private static convertColorCode(x: number): string {
-        if (x < 0) {
-            return '00';
-        } else if (x > 255) {
-            return 'FF';
-        } else {
-            return ('00' + x.toString(16)).slice(-2);
-        }
-    }
-
 }
