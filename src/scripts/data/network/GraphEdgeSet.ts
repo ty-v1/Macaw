@@ -1,20 +1,20 @@
 import HashMap from "hashmap";
-import {RGB} from "@/scripts/color/RGB";
-import {NWEdge} from "@/scripts/data/network/NWEdge";
+import {Color} from "@/scripts/color/Color";
+import {GraphEdge} from "@/scripts/data/network/GraphEdge";
 
-export class NWEdgeSet {
+export class GraphEdgeSet {
 
-    private idToEdge: HashMap<string, NWEdge>;
+    private idToEdge: HashMap<string, GraphEdge>;
 
     public constructor() {
         this.idToEdge = new HashMap()
     }
 
-    public addNWEdge(edge: NWEdge): void {
+    public add(edge: GraphEdge): void {
         this.idToEdge.set(edge.id, edge);
     }
 
-    public getNWNode(id: string): NWEdge {
+    public get(id: string): GraphEdge {
         if (this.idToEdge.has(id)) {
             return this.idToEdge.get(id);
         } else {
@@ -24,12 +24,16 @@ export class NWEdgeSet {
                 targetY: 0,
                 sourceX: 0,
                 sourceY: 0,
-                color: RGB.BLACK
+                color: Color.BLACK
             };
         }
     }
 
-    public size():number{
+    public size(): number {
         return this.idToEdge.count();
+    }
+
+    public values(): GraphEdge[] {
+        return this.idToEdge.values();
     }
 }
