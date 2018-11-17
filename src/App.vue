@@ -7,7 +7,7 @@
         <div id="nav">
             <router-link to="/">Network Graph</router-link>
             |
-            <router-link to="/about">Bar Graph</router-link>
+            <router-link to="/about">Line Graph</router-link>
         </div>
         <router-view/>
     </div>
@@ -51,7 +51,7 @@
                         this.$store.commit('VariantStore/setVariants',
                                            {jsonString: reader.result.toString()});
 
-                        this.$store.commit('LayoutStore/applyLayout',
+                        this.$store.commit('LayoutStore/apply',
                                            {
                                                variants:
                                                    this.$store.getters['VariantStore/variants'],
@@ -60,7 +60,6 @@
                                                generationNumberToVariantCount:
                                                    this.$store.getters['VariantStore/generationNumberToVariantCount']
                                            });
-                        // console.log('----------------------');
                     }
                 };
                 reader.readAsText(file);
