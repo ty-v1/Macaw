@@ -1,7 +1,12 @@
 import {Variant} from "@/scripts/data/Variant";
+import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 
 export interface INodePositionStrategy {
-    createNodeX(variant: Variant): number
 
-    createNodeY(variant: Variant): number
+    exec(variants: Variant[],
+         maxGenerationNumber: number,
+         xPadding: number,
+         yPadding: number,
+         nodes: GraphNodeSet): void;
+
 }

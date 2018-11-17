@@ -1,12 +1,13 @@
 import {INodePositionStrategy} from "@/scripts/network/node/strategy/position/INodePositionStrategy";
 import {Variant} from "@/scripts/data/Variant";
+import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 
 export class DefaultNodePosition implements INodePositionStrategy {
-    createNodeX(variant: Variant): number {
-        return 0;
-    }
 
-    createNodeY(variant: Variant): number {
-        return 0;
+    exec(variants: Variant[],
+         maxGenerationNumber: number,
+         xPadding: number,
+         yPadding: number,
+         nodes: GraphNodeSet): void {
     }
 }
