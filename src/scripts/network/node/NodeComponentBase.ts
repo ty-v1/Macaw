@@ -1,12 +1,12 @@
 import Vue from "vue";
 import {Component, Prop} from "vue-property-decorator";
 import {sprintf} from "sprintf-js";
-import {NWNode} from "@/scripts/data/network/NWNode";
+import {GraphNode} from "@/scripts/data/network/GraphNode";
 
 @Component
 export default class NodeComponentBase extends Vue {
     @Prop() id!: string;
-    @Prop() node!: NWNode;
+    @Prop() node!: GraphNode;
 
     get transform(): string {
         const x: number = this.node.x;

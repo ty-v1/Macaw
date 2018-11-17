@@ -1,12 +1,12 @@
 import Component from "vue-class-component";
 import Vue from "vue";
 import {Prop} from "vue-property-decorator";
-import {NWEdge} from "@/scripts/data/network/NWEdge";
+import {GraphEdge} from "@/scripts/data/network/GraphEdge";
 
 @Component
 export default class EdgeComponentBase extends Vue {
     @Prop() id!: string;
-    @Prop({required:true}) edge!: NWEdge;
+    @Prop() edge!: GraphEdge;
 
     /**
      * computed methods
