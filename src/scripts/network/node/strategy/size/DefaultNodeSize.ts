@@ -1,12 +1,9 @@
 import {INodeSizeStrategy} from "@/scripts/network/node/strategy/size/INodeSizeStrategy";
 import {Variant} from "@/scripts/data/Variant";
+import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 
 export class DefaultNodeSize implements INodeSizeStrategy {
-    createNodeHeight(variant: Variant): number {
-        return 0;
-    }
 
-    createNodeWidth(variant: Variant): number {
-        return 0;
+    exec(variants: Variant[], maxGenerationNumber: number, nodes: GraphNodeSet): void {
     }
 }

@@ -1,7 +1,9 @@
 import {Variant} from "@/scripts/data/Variant";
+import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 
 export interface INodeSizeStrategy {
-    createNodeWidth(variant: Variant): number;
 
-    createNodeHeight(variant: Variant): number;
+    exec(variants: Variant[],
+         maxGenerationNumber: number,
+         nodes: GraphNodeSet): void;
 }
