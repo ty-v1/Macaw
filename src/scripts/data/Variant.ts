@@ -1,4 +1,4 @@
-import {Patch} from "@/scripts/data/Patch";
+import {Diff} from "@/scripts/data/Diff";
 import {Operation} from "@/scripts/data/Operation";
 import {TestSummary} from "@/scripts/data/TestSummary";
 import HashMap from "hashmap";
@@ -10,20 +10,20 @@ export class Variant {
     private readonly fitness: number;
     private readonly buildSuccess: boolean;
     private readonly selectionCount: number;
-    private readonly patches: Patch[];
+    private readonly patch: Diff[];
     private readonly idToOperations: HashMap<string, Operation>;
     private readonly testSummary: TestSummary;
 
     private readonly selected: boolean;
 
     public constructor(id: string, generationNumber: number, fitness: number, buildSuccess: boolean,
-                       selectionCount: number, patches: Patch[], operations: Operation[],
+                       selectionCount: number, patch: Diff[], operations: Operation[],
                        testSummary: TestSummary, selected: boolean = false) {
         this.id = id;
         this.generationNumber = generationNumber;
         this.fitness = fitness;
         this.buildSuccess = buildSuccess;
-        this.patches = patches;
+        this.patch = patch;
         this.testSummary = testSummary;
         this.selected = selected;
         this.selectionCount = selectionCount;
@@ -54,8 +54,8 @@ export class Variant {
         this.idToOperations.set(newId, operation);
     }
 
-    public getPatches(): Patch[] {
-        return this.patches;
+    public getPatches(): Diff[] {
+        return this.patch;
     }
 
     public getFitness(): number {

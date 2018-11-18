@@ -1,4 +1,4 @@
-export type Patch = {
+export type Diff = {
     diff: string,
     fileName: string
 }
