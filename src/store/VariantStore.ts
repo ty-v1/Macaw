@@ -2,7 +2,7 @@ import HashMap from "hashmap";
 import {Variant} from "@/scripts/data/Variant";
 import {JSONData} from "@/scripts/data/JSONData";
 import {VariantDatum} from "@/scripts/data/VariantDatum";
-import {Patch} from "@/scripts/data/Patch";
+import {Diff} from "@/scripts/data/Diff";
 import {TestSummary} from "@/scripts/data/TestSummary";
 import {Operation} from "@/scripts/data/Operation";
 import {sprintf} from "sprintf-js";
@@ -126,7 +126,7 @@ function resolveCopy(variantData: VariantDatum[]): HashMap<string, Variant> {
     variantData.forEach((variantDatum) => {
         const id: string = variantDatum.id;
         const selectionCount: number = variantDatum.selectionCount;
-        const patches: Patch[] = variantDatum.patches;
+        const patch: Diff[] = variantDatum.patch;
         const fitness: number = variantDatum.fitness;
         const buildSuccess: boolean = variantDatum.isBuildSuccess;
         const generationNumber: number = variantDatum.generationNumber;
@@ -138,7 +138,7 @@ function resolveCopy(variantData: VariantDatum[]): HashMap<string, Variant> {
                                             fitness,
                                             buildSuccess,
                                             selectionCount,
-                                            patches,
+                                            patch,
                                             operations,
                                             testSummary);
         idToVariant.set(id, parent);
@@ -154,7 +154,7 @@ function resolveCopy(variantData: VariantDatum[]): HashMap<string, Variant> {
                                                  fitness,
                                                  buildSuccess,
                                                  selectionCount,
-                                                 patches,
+                                                 patch,
                                                  operations,
                                                  testSummary,
                                                  true);

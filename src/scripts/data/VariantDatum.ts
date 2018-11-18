@@ -1,5 +1,5 @@
 import {Operation} from "@/scripts/data/Operation";
-import {Patch} from "@/scripts/data/Patch";
+import {Diff} from "@/scripts/data/Diff";
 import {TestSummary} from "@/scripts/data/TestSummary";
 
 export type VariantDatum = {
@@ -9,6 +9,6 @@ export type VariantDatum = {
     selectionCount: number,
     isBuildSuccess: boolean,
     testSummary: TestSummary,
-    patches: Patch[],
+    patch: Diff[],
     operations: Operation[]
 }
