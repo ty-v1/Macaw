@@ -1,19 +1,29 @@
 <template>
-    <svg :width="SVGWidth" :height="SVGHeight">
-        <g transform="translate(20, 20)">
-            <SimpleLine v-for="edge in simpleLine"
-                        :edge="edge">
-            </SimpleLine>
+    <div class="o">
+        <svg :width="SVGWidth" :height="SVGHeight" class="svg">
+            <g transform="translate(20, 20)">
+                <SimpleLine v-for="edge in simpleLine"
+                            :key="edge.id"
+                            :edge="edge">
+                </SimpleLine>
 
-            <CircleNode v-for="node in circleNode"
-                        :node="node">
-            </CircleNode>
+                <CircleNode v-for="node in circleNode"
+                            :key="node.id"
+                            :node="node"
+                            @node-mouse-over="onNodeMouseOver"
+                            @node-mouse-out="onNodeMouseOut">
+                </CircleNode>
 
-            <CrossNode v-for="node in crossNode"
-                       :node="node">
-            </CrossNode>
-        </g>
-    </svg>
+                <CrossNode v-for="node in crossNode"
+                           :key="node.id"
+                           :node="node">
+                </CrossNode>
+            </g>
+        </svg>
+
+        <Popup></Popup>
+
+    </div>
 </template>
 
 <script lang="ts">
@@ -29,8 +39,10 @@
     import {FixedNodeSize} from "../../scripts/network/node/strategy/size/FixedNodeSize";
     import {FitnessBasedNodeShape} from "../../scripts/network/node/strategy/shape/FitnessBasedNodeShape";
     import {Variant} from "../../scripts/data/Variant";
+    import Popup from "../Popup.vue";
+    import {NodeMouseOverEvent} from "../../scripts/event/NodeMouseOverEvent";
 
-    @Component({components: {SimpleLine, CrossNode, CircleNode}})
+    @Component({components: {Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
         /**
          * data
@@ -69,6 +81,27 @@
         }
 
         /**
+         * custom event handler
+         * */
+        onNodeMouseOver(event: NodeMouseOverEvent) {
+
+            const variant: Variant = this.$store.getters['VariantStore/variant'](event.id);
+
+            this.$store.commit('VariantPopupStore/initializeData',
+                               {
+                                   variant: variant,
+                                   x: event.pageX,
+                                   y: event.pageY,
+                                   width: 100,
+                                   height: 100,
+                               });
+        }
+
+        onNodeMouseOut() {
+            this.$store.commit('VariantPopupStore/dismiss');
+        }
+
+        /**
          * life cycle
          * */
         created() {
@@ -100,6 +133,17 @@
 </script>
 
 <style>
+    .svg {
+        position: absolute;
+        z-index: 0
+    }
+
+    .o {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
     path {
         vector-effect: non-scaling-stroke;
         stroke-width: 1;
