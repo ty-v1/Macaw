@@ -1,7 +1,8 @@
 import Vue from 'vue';
-import Vuex, {createNamespacedHelpers} from 'vuex';
+import Vuex from 'vuex';
 import {LayoutStore} from "./store/LayoutStore";
 import {VariantStore} from "./store/VariantStore";
+import {VariantPopupStore} from "./store/VariantPopupStore";
 
 // ストアの設定
 
@@ -11,7 +12,8 @@ const store = new Vuex.Store(
     {
         modules: {
             VariantStore,
-            LayoutStore
+            LayoutStore,
+            VariantPopupStore
         },
     });
 
