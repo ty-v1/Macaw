@@ -1,26 +1,27 @@
 <template>
-    <div class="o">
-        <svg :width="SVGWidth" :height="SVGHeight" class="svg">
-            <g transform="translate(20, 20)">
-                <SimpleLine v-for="edge in simpleLine"
-                            :key="edge.id"
-                            :edge="edge">
-                </SimpleLine>
+    <div class="content">
+        <div class="svg-wrapper">
+            <svg :width="SVGWidth" :height="SVGHeight" class="svg">
+                <g transform="translate(20, 20)">
+                    <SimpleLine v-for="edge in simpleLine"
+                                :key="edge.id"
+                                :edge="edge">
+                    </SimpleLine>
 
-                <CircleNode v-for="node in circleNode"
-                            :key="node.id"
-                            :node="node"
-                            @node-mouse-over="onNodeMouseOver"
-                            @node-mouse-out="onNodeMouseOut">
-                </CircleNode>
+                    <CircleNode v-for="node in circleNode"
+                                :key="node.id"
+                                :node="node"
+                                @node-mouse-over="onNodeMouseOver"
+                                @node-mouse-out="onNodeMouseOut">
+                    </CircleNode>
 
-                <CrossNode v-for="node in crossNode"
-                           :key="node.id"
-                           :node="node">
-                </CrossNode>
-            </g>
-        </svg>
-
+                    <CrossNode v-for="node in crossNode"
+                               :key="node.id"
+                               :node="node">
+                    </CrossNode>
+                </g>
+            </svg>
+        </div>
         <Popup></Popup>
 
     </div>
@@ -135,19 +136,27 @@
     }
 </script>
 
-<style>
-    .svg {
+<style scoped>
+    svg {
         position: absolute;
         z-index: 0
     }
 
-    .o {
+    .content {
         position: absolute;
-        overflow: scroll;
+        overflow: hidden;
         width: 75%;
         height: 100%;
     }
 
+    .svg-wrapper {
+        position: absolute;
+        overflow: scroll;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<style>
     path {
         vector-effect: non-scaling-stroke;
         stroke-width: 1;
