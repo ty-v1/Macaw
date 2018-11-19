@@ -23,6 +23,8 @@ const state: VariantStoreState = {
 const getters = {
     variants: state => state.idToVariant.values(),
 
+    variant: state => (id: string) => state.idToVariant.get(id),
+
     maxGenerationNumber: state => state.maxGenerationNumber,
 
     projectName: state => state.projectName,
