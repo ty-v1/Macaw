@@ -26,8 +26,8 @@
                 nodeY: this.node.y,
                 nodeWidth: this.node.width,
                 nodeHeight: this.node.height,
-                pageX: event.pageX,
-                pageY: event.pageY
+                pageX: event.offsetX,
+                pageY: event.offsetY
             };
         }
 
