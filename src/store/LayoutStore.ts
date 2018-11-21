@@ -8,7 +8,7 @@ import {DefaultNodeShape} from "@/scripts/network/node/strategy/shape/DefaultNod
 
 export interface LayoutStoreState {
     layoutStrategy: LayoutFactory,
-    layout: Layout
+    layout: Layout | null
 }
 
 const state: LayoutStoreState = {
@@ -57,6 +57,16 @@ const mutations = {
                                   30,
                                   20);
     },
+
+    // TODO Nodeのクラスを変更する
+    changeNodeClass: (state, payload) => {
+
+    },
+
+    // TODO Nodeのクラスをリセットする
+    resetNodeClass: (state, payload) => {
+
+    }
 };
 
 const actions = {};

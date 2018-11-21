@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import {LayoutStore} from "./store/LayoutStore";
 import {VariantStore} from "./store/VariantStore";
 import {VariantPopupStore} from "./store/VariantPopupStore";
+import {DiffStore} from "./store/DiffStore";
 
 // ストアの設定
 
@@ -13,7 +14,8 @@ const store = new Vuex.Store(
         modules: {
             VariantStore,
             LayoutStore,
-            VariantPopupStore
+            VariantPopupStore,
+            DiffStore
         },
     });
 
