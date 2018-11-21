@@ -12,7 +12,8 @@
                                 :key="node.id"
                                 :node="node"
                                 @node-mouse-over="onNodeMouseOver"
-                                @node-mouse-out="onNodeMouseOut">
+                                @node-mouse-out="onNodeMouseOut"
+                                @node-click="onNodeClick">
                     </CircleNode>
 
                     <CrossNode v-for="node in crossNode"
@@ -21,9 +22,8 @@
                     </CrossNode>
                 </g>
             </svg>
+            <Popup></Popup>
         </div>
-        <Popup></Popup>
-
     </div>
 </template>
 
@@ -42,6 +42,7 @@
     import {Variant} from "../../scripts/data/Variant";
     import Popup from "../Popup.vue";
     import {NodeMouseOverEvent} from "../../scripts/event/NodeMouseOverEvent";
+    import {NodeClickEvent} from "../../scripts/event/NodeClickEvent";
 
     @Component({components: {Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
@@ -105,6 +106,21 @@
             this.$store.commit('VariantPopupStore/dismiss');
         }
 
+        onNodeClick(event: NodeClickEvent) {
+            if (event.isClicked) {
+                this.$store.commit('DiffStore/addVariantId',
+                                   {
+                                       variantId: event.id
+                                   });
+
+            } else {
+                this.$store.commit('DiffStore/deleteVariantId',
+                                   {
+                                       variantId: event.id
+                                   });
+            }
+        }
+
         /**
          * life cycle
          * */
@@ -138,19 +154,18 @@
 
 <style scoped>
     svg {
-        position: absolute;
+        position: relative;
         z-index: 0
     }
 
     .content {
-        position: absolute;
         overflow: hidden;
-        width: 75%;
+        width: 100%;
         height: 100%;
     }
 
     .svg-wrapper {
-        position: absolute;
+        position: relative;
         overflow: scroll;
         width: 100%;
         height: 100%;
