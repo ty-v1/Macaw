@@ -9,7 +9,9 @@
             |
             <router-link to="/about">Line Graph</router-link>
         </div>
-        <router-view/>
+        <div style="height: 90%;">
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 
@@ -82,7 +84,8 @@
     }
 
     #nav {
-        padding: 30px;
+        margin: 10px;
+        height: 10%;
         a {
             font-weight: bold;
             color: #2c3e50;
@@ -93,13 +96,9 @@
         }
     }
 
-    /*html {*/
-        /*width: 100%;*/
-        /*height: 100%;*/
-    /*}*/
-
-    /*body {*/
-        /*width: 100%;*/
-        /*height: 100%;*/
-    /*}*/
+    #content {
+        width: 100%;
+        height: 90%;
+    }
 </style>
+
