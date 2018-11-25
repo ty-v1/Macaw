@@ -4,8 +4,10 @@
                 cx="1"
                 cy="1"
                 :fill="color"
+                :class="(isClicked)? 'highlighted' : ''"
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
+                @click="onClick"
         ></circle>
     </g>
 </template>
@@ -14,9 +16,14 @@
     import {Component, Emit} from 'vue-property-decorator';
     import NodeComponentBase from "../../../scripts/network/node/NodeComponentBase";
     import {NodeMouseOverEvent} from "../../../scripts/event/NodeMouseOverEvent";
+    import {NodeClickEvent} from "../../../scripts/event/NodeClickEvent";
 
     @Component
     export default class CircleNode extends NodeComponentBase {
+        /**
+         * data
+         * */
+        isClicked = false;
 
         @Emit('node-mouse-over')
         public onMouseOver(event: MouseEvent): NodeMouseOverEvent {
@@ -26,13 +33,29 @@
                 nodeY: this.node.y,
                 nodeWidth: this.node.width,
                 nodeHeight: this.node.height,
-                pageX: event.pageX,
-                pageY: event.pageY
+                pageX: event.offsetX,
+                pageY: event.offsetY
             };
         }
 
         @Emit('node-mouse-out')
         public onMouseOut() {
         }
+
+        @Emit('node-click')
+        public onClick(): NodeClickEvent {
+            this.isClicked = !this.isClicked;
+            return {
+                id: this.node.id,
+                isClicked: this.isClicked
+            };
+        }
     }
 </script>
+
+<style>
+    .highlighted {
+        stroke: #000000;
+        stroke-width: 4px;
+    }
+</style>

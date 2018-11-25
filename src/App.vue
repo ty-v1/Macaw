@@ -9,7 +9,9 @@
             |
             <router-link to="/about">Line Graph</router-link>
         </div>
-        <router-view/>
+        <div style="height: 90%;">
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 
@@ -48,6 +50,7 @@
                 const reader = new FileReader();
                 reader.onload = () => {
                     if (reader.result !== null) {
+                        this.$store.commit('DiffStore/reset', {});
                         this.$store.commit('VariantStore/setVariants',
                                            {jsonString: reader.result.toString()});
 
@@ -78,10 +81,12 @@
         color: #2c3e50;
         width: 100%;
         height: 100%;
+        overflow: hidden;
     }
 
     #nav {
-        padding: 30px;
+        margin: 10px;
+        height: 10%;
         a {
             font-weight: bold;
             color: #2c3e50;
@@ -92,13 +97,9 @@
         }
     }
 
-    html {
+    #content {
         width: 100%;
-        height: 100%;
-    }
-
-    body {
-        width: 100%;
-        height: 100%;
+        height: 90%;
     }
 </style>
+

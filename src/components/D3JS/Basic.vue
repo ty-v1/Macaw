@@ -1,28 +1,29 @@
 <template>
-    <div class="o">
-        <svg :width="SVGWidth" :height="SVGHeight" class="svg">
-            <g transform="translate(20, 20)">
-                <SimpleLine v-for="edge in simpleLine"
-                            :key="edge.id"
-                            :edge="edge">
-                </SimpleLine>
+    <div class="content">
+        <div class="svg-wrapper">
+            <svg :width="SVGWidth" :height="SVGHeight" class="svg">
+                <g transform="translate(20, 20)">
+                    <SimpleLine v-for="edge in simpleLine"
+                                :key="edge.id"
+                                :edge="edge">
+                    </SimpleLine>
 
-                <CircleNode v-for="node in circleNode"
-                            :key="node.id"
-                            :node="node"
-                            @node-mouse-over="onNodeMouseOver"
-                            @node-mouse-out="onNodeMouseOut">
-                </CircleNode>
+                    <CircleNode v-for="node in circleNode"
+                                :key="node.id"
+                                :node="node"
+                                @node-mouse-over="onNodeMouseOver"
+                                @node-mouse-out="onNodeMouseOut"
+                                @node-click="onNodeClick">
+                    </CircleNode>
 
-                <CrossNode v-for="node in crossNode"
-                           :key="node.id"
-                           :node="node">
-                </CrossNode>
-            </g>
-        </svg>
-
-        <Popup></Popup>
-
+                    <CrossNode v-for="node in crossNode"
+                               :key="node.id"
+                               :node="node">
+                    </CrossNode>
+                </g>
+            </svg>
+            <Popup></Popup>
+        </div>
     </div>
 </template>
 
@@ -41,6 +42,7 @@
     import {Variant} from "../../scripts/data/Variant";
     import Popup from "../Popup.vue";
     import {NodeMouseOverEvent} from "../../scripts/event/NodeMouseOverEvent";
+    import {NodeClickEvent} from "../../scripts/event/NodeClickEvent";
 
     @Component({components: {Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
@@ -73,11 +75,11 @@
         }
 
         get SVGWidth() {
-            return this.$store.getters['LayoutStore/svgWidth'];
+            return this.$store.getters['LayoutStore/svgWidth'] + 40;
         }
 
         get SVGHeight() {
-            return this.$store.getters['LayoutStore/svgHeight'];
+            return this.$store.getters['LayoutStore/svgHeight'] + 40;
         }
 
         /**
@@ -87,11 +89,14 @@
 
             const variant: Variant = this.$store.getters['VariantStore/variant'](event.id);
 
+            const x: number = event.nodeX + event.nodeWidth * 2 + 30;
+            const y: number = event.nodeY;
+
             this.$store.commit('VariantPopupStore/initializeData',
                                {
                                    variant: variant,
-                                   x: event.pageX,
-                                   y: event.pageY,
+                                   x: x,
+                                   y: y,
                                    width: 100,
                                    height: 100,
                                });
@@ -99,6 +104,21 @@
 
         onNodeMouseOut() {
             this.$store.commit('VariantPopupStore/dismiss');
+        }
+
+        onNodeClick(event: NodeClickEvent) {
+            if (event.isClicked) {
+                this.$store.commit('DiffStore/addVariantId',
+                                   {
+                                       variantId: event.id
+                                   });
+
+            } else {
+                this.$store.commit('DiffStore/deleteVariantId',
+                                   {
+                                       variantId: event.id
+                                   });
+            }
         }
 
         /**
@@ -132,18 +152,26 @@
     }
 </script>
 
-<style>
-    .svg {
-        position: absolute;
+<style scoped>
+    svg {
+        position: relative;
         z-index: 0
     }
 
-    .o {
-        position: absolute;
+    .content {
+        overflow: hidden;
         width: 100%;
         height: 100%;
     }
 
+    .svg-wrapper {
+        position: relative;
+        overflow: scroll;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<style>
     path {
         vector-effect: non-scaling-stroke;
         stroke-width: 1;
