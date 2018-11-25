@@ -24,6 +24,7 @@ const mutations = {
     },
     deleteVariantId: (state, payload) => {
         const variantId: string = payload.variantId;
+
         if (state.variantIdSet.has(variantId)) {
             state.variantIdSet.delete(variantId);
             state.variantIds = Array.from(state.variantIdSet);

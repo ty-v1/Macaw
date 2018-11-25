@@ -75,11 +75,11 @@
         }
 
         get SVGWidth() {
-            return this.$store.getters['LayoutStore/svgWidth'];
+            return this.$store.getters['LayoutStore/svgWidth'] + 40;
         }
 
         get SVGHeight() {
-            return this.$store.getters['LayoutStore/svgHeight'];
+            return this.$store.getters['LayoutStore/svgHeight'] + 40;
         }
 
         /**

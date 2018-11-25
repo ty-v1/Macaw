@@ -50,6 +50,7 @@
                 const reader = new FileReader();
                 reader.onload = () => {
                     if (reader.result !== null) {
+                        this.$store.commit('DiffStore/reset', {});
                         this.$store.commit('VariantStore/setVariants',
                                            {jsonString: reader.result.toString()});
 

@@ -1,5 +1,6 @@
 <template>
     <div class="diff-list-wrapper">
+        <button @click="onClick">Close</button>
         <div>
             <p>Generation Number : {{getGenerationNumber}}</p>
             <p>Fitness : {{getFitness}}</p>
@@ -53,6 +54,14 @@
             getFitness: function () {
                 const variant = this.$store.getters['VariantStore/variant'](this.variantId);
                 return variant.getFitness();
+            }
+        },
+        methods: {
+            onClick: function () {
+                this.$store.commit('DiffStore/deleteVariantId',
+                    {
+                        variantId: this.variantId
+                    });
             }
         }
     }

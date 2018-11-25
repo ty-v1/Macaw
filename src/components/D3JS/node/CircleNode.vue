@@ -55,7 +55,7 @@
 
 <style>
     .highlighted {
-        stroke: #FF0000;
-        stroke-width: 2px;
+        stroke: #000000;
+        stroke-width: 4px;
     }
 </style>
