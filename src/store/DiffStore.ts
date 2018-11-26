@@ -30,7 +30,7 @@ const mutations = {
             state.variantIds = Array.from(state.variantIdSet);
         }
     },
-    clear: state => {
+    reset: state => {
         state.variantIdSet.clear();
         state.variantIds = [];
     }
