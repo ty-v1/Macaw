@@ -53,16 +53,6 @@
                         this.$store.commit('DiffStore/reset', {});
                         this.$store.commit('VariantStore/setVariants',
                                            {jsonString: reader.result.toString()});
-
-                        this.$store.commit('LayoutStore/apply',
-                                           {
-                                               variants:
-                                                   this.$store.getters['VariantStore/variants'],
-                                               maxGenerationNumber:
-                                                   this.$store.getters['VariantStore/maxGenerationNumber'],
-                                               generationNumberToVariantCount:
-                                                   this.$store.getters['VariantStore/generationNumberToVariantCount']
-                                           });
                     }
                 };
                 reader.readAsText(file);

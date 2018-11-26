@@ -55,6 +55,9 @@
             Color.GREEN
         ];
 
+        private unwatch: () => void = () => {
+        };
+
         /**
          *  computed
          *  */
@@ -125,6 +128,10 @@
          * life cycle
          * */
         created() {
+            this.unwatch = this.$store.watch(
+                state => state.VariantStore.idToVariant,
+                () => this.apply());
+
             const midCalculator = (variants: Variant[]) => {
                 for (let i = 0; i < variants.length; i++) {
                     if (variants[i].getId() === "0") {
@@ -134,11 +141,10 @@
                 return 0.5;
             };
 
-            this.$store.commit('LayoutStore/setNodeColorStrategy',
-                               {
-                                   nodeColorStrategy: new ThreeBasePointsGradation(Basic.BASE_COLOR_CODES,
-                                                                                   midCalculator)
-                               });
+            this.$store.commit('LayoutStore/setNodeColorStrategy', {
+                nodeColorStrategy: new ThreeBasePointsGradation(
+                    Basic.BASE_COLOR_CODES, midCalculator)
+            });
 
             this.$store.commit('LayoutStore/setNodePositionStrategy',
                                {nodePositionStrategy: new NoAlignHierarchy()});
@@ -148,6 +154,26 @@
 
             this.$store.commit('LayoutStore/setNodeShapeStrategy',
                                {nodeShapeStrategy: new FitnessBasedNodeShape()});
+
+            this.apply();
+        }
+
+        beforeDestroy() {
+            // ウォッチャをリセットする
+            this.unwatch();
+        }
+
+        private apply() {
+            const variants: Variant[] = this.$store.getters['VariantStore/variants'];
+            const maxGenerationNumber: number
+                = this.$store.getters['VariantStore/maxGenerationNumber'];
+            const generationNumberToVariantCount: number[] =
+                this.$store.getters['VariantStore/generationNumberToVariantCount'];
+            this.$store.commit('LayoutStore/apply', {
+                variants: variants,
+                maxGenerationNumber: maxGenerationNumber,
+                generationNumberToVariantCount: generationNumberToVariantCount
+            });
         }
     }
 </script>

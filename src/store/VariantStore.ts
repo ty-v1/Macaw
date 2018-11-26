@@ -47,19 +47,27 @@ const getters = {
     generationNumberToFitnessStatistics: state => {
 
         const generationNumberToStatistics: Statistics[] = new Array(state.maxGenerationNumber + 1);
-        generationNumberToStatistics.fill({
-                                              max: 0,
-                                              min: 0,
-                                              sum: 0,
-                                              count: 0
-                                          });
+        for (let i = 0; i <= state.maxGenerationNumber; i++) {
+            generationNumberToStatistics[i] = {
+                max: 0,
+                min: 0,
+                sum: 0,
+                count: 0
+            };
+        }
 
         state.idToVariant.values()
              .forEach((variant: Variant) => {
+
+                 if (!variant.isBuildSuccess()) {
+                     return;
+                 }
+
                  const generationNumber = variant.getGenerationNumber();
                  const fitness = variant.getFitness();
 
                  const statistics = generationNumberToStatistics[generationNumber];
+
 
                  // 最大値を更新する
                  if (statistics.max < fitness) {
