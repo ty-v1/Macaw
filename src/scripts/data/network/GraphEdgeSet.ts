@@ -24,7 +24,9 @@ export class GraphEdgeSet {
                 targetY: 0,
                 sourceX: 0,
                 sourceY: 0,
-                color: Color.BLACK
+                color: Color.BLACK,
+                sourceId: "null",
+                targetId: "null",
             };
         }
     }

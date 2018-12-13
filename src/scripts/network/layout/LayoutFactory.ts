@@ -115,7 +115,9 @@ export class LayoutFactory {
                            sourceY: sourceNode.y + sourceNode.height * 2,
                            targetX: targetNode.x + targetNode.width,
                            targetY: targetNode.y,
-                           color: Color.BLACK
+                           color: Color.BLACK,
+                           sourceId: sourceNode.id,
+                           targetId: targetNode.id
                        };
                        edges.add(edge);
                    });
