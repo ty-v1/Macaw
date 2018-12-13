@@ -18,7 +18,9 @@
 
                     <CrossNode v-for="node in crossNode"
                                :key="node.id"
-                               :node="node">
+                               :node="node"
+                               @node-mouse-over="onNodeMouseOver"
+                               @node-mouse-out="onNodeMouseOut">
                     </CrossNode>
                 </g>
             </svg>
