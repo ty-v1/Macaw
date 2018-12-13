@@ -39,4 +39,8 @@ export class GraphEdgeSet {
     public values(): GraphEdge[] {
         return this.idToEdge.values();
     }
+
+    public has(id: string): boolean {
+        return this.idToEdge.has(id);
+    }
 }

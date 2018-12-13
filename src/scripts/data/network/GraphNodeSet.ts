@@ -79,4 +79,8 @@ export class GraphNodeSet {
             });
         return max;
     }
+
+    public has(id: string): boolean {
+        return this.idToNode.has(id);
+    }
 }
