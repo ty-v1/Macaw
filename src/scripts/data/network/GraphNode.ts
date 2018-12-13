@@ -7,5 +7,6 @@ export type GraphNode = {
     color: Color,
     width: number,
     height: number,
-    shape:string
+    shape: string,
+    // isHighlighted: boolean,
 }

@@ -7,4 +7,7 @@ export type GraphEdge = {
     sourceY: number,
     targetX: number,
     targetY: number,
+    sourceId: string,
+    targetId: string,
+    // isHighlighted: boolean
 }
