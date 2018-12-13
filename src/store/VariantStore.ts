@@ -7,6 +7,7 @@ import {TestSummary} from "@/scripts/data/TestSummary";
 import {Operation} from "@/scripts/data/Operation";
 import {sprintf} from "sprintf-js";
 import {Statistics} from "@/scripts/data/Statistics";
+import {CompressedVariant} from "@/scripts/data/CompressedVariant";
 
 export interface VariantStoreState {
     idToVariant: HashMap<string, Variant>,
@@ -21,7 +22,7 @@ const state: VariantStoreState = {
 };
 
 const getters = {
-    variants: state => state.idToVariant.values(),
+    variants: state => state.idToVariant.values().sort(Variant.compare),
 
     variant: state => (id: string) => state.idToVariant.get(id),
 
@@ -122,10 +123,16 @@ const mutations = {
         // 選択されたVariantの子の親IDを書き換える
         changeSelectVariantParentId(idToVariant);
 
+        // 世代数の最大値を求める
+        const maxGenerationNumber = searchMaxGenerationNumber(idToVariant.values());
+
+        // いらない個体を圧縮する
+        compressVariantData(idToVariant, maxGenerationNumber);
+
         state.idToVariant = idToVariant;
 
         // 世代数の最大値を求める
-        state.maxGenerationNumber = searchMaxGenerationNumber(state.idToVariant.values());
+        state.maxGenerationNumber = maxGenerationNumber;
     },
 };
 
@@ -135,13 +142,15 @@ function resolveCopy(variantData: VariantDatum[]): HashMap<string, Variant> {
     const idToVariant: HashMap<string, Variant> = new HashMap<string, Variant>();
     variantData.forEach((variantDatum) => {
         const id: string = variantDatum.id;
-        const selectionCount: number = variantDatum.selectionCount;
+        const selectionCount: number = (id === "0") ?
+            variantDatum.selectionCount + 1 : variantDatum.selectionCount
         const patch: Diff[] = variantDatum.patch;
         const fitness: number = variantDatum.fitness;
         const buildSuccess: boolean = variantDatum.isBuildSuccess;
         const generationNumber: number = variantDatum.generationNumber;
         const testSummary: TestSummary = variantDatum.testSummary;
         const operations: Operation[] = variantDatum.operations;
+
         // 親のVariantを追加する
         const parent: Variant = new Variant(id,
                                             generationNumber,
@@ -211,6 +220,43 @@ function changeSelectVariantParentId(idToVariant: HashMap<string, Variant>) {
                               variant.changeParentId(oldParentId, newParentId);
                           });
                });
+}
+
+// 不要なデータを圧縮する
+function compressVariantData(idToVariant: HashMap<string, Variant>, maxGenerationNumber: number): void {
+    // 世代 -> ビルドに失敗した個体の数
+    const buildFailedVariantCount: number[] = Array(maxGenerationNumber + 1);
+    const compressedVariantIds: Set<string> = new Set<string>();
+
+    buildFailedVariantCount.fill(0);
+
+    // 圧縮するVariantを探す
+    idToVariant.values()
+               .forEach((variant) => {
+                   if (!variant.isBuildSuccess()) {
+                       buildFailedVariantCount[variant.getGenerationNumber()]++;
+                       compressedVariantIds.add(variant.getId());
+                   }
+               });
+
+    // 圧縮する個体を消す
+    compressedVariantIds.forEach((variantId) => {
+        idToVariant.remove(variantId);
+    });
+
+    // CompressedVariantを追加する
+    for (let i = 0; i < buildFailedVariantCount.length; i++) {
+        const count = buildFailedVariantCount[i];
+        if (count === 0) {
+            continue;
+        }
+        const id: string = sprintf('c%d', i);
+
+        const compressedVariant = new CompressedVariant(id, i, -1.0, count);
+
+        idToVariant.set(id, compressedVariant);
+    }
+
 }
 
 const actions = {};
