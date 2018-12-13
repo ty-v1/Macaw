@@ -25,7 +25,8 @@ export class GraphNodeSet {
                 width: 0,
                 height: 0,
                 color: Color.BLACK,
-                shape: "none"
+                shape: "none",
+                highlighted: false
             };
         }
     }

@@ -9,5 +9,5 @@ export type GraphEdge = {
     targetY: number,
     sourceId: string,
     targetId: string,
-    // isHighlighted: boolean
+    highlighted: boolean
 }
