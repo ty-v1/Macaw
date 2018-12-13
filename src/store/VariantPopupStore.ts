@@ -1,25 +1,25 @@
 import {Variant} from "@/scripts/data/Variant";
+import {MessageData} from "@/scripts/data/MessageData";
+import {NullMessageData} from "@/scripts/data/network/NullMessageData";
 
 export interface VariantPopupStoreState {
-    fitness: number,
-    generationNumber: number
     x: number,
     y: number,
     width: number,
     height: number,
     isShow: boolean,
-    isUndefinedData: boolean
+    isUndefinedData: boolean,
+    messageData: MessageData
 }
 
 const state: VariantPopupStoreState = {
-    fitness: 0,
-    generationNumber: 0,
     x: 0,
     y: 0,
     width: 0,
     height: 0,
     isShow: false,
-    isUndefinedData: true
+    isUndefinedData: true,
+    messageData: new NullMessageData()
 };
 
 const getters = {
@@ -38,6 +38,8 @@ const getters = {
     isShow: state => state.isShow,
 
     isUndefinedData: state => state.isUndefinedData,
+
+    messageData: state => state.messageData
 };
 
 const mutations = {
@@ -48,9 +50,8 @@ const mutations = {
     initializeData: (state, payload) => {
         const variant: Variant = payload.variant;
 
+        state.messageData = variant.generateMessage();
         state.isUndefinedData = (variant !== undefined);
-        state.fitness = variant.getFitness();
-        state.generationNumber = variant.getGenerationNumber();
         state.isShow = true;
         state.x = payload.x;
         state.y = payload.y;
