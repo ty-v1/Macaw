@@ -2,6 +2,8 @@ import {Diff} from "@/scripts/data/Diff";
 import {Operation} from "@/scripts/data/Operation";
 import {TestSummary} from "@/scripts/data/TestSummary";
 import HashMap from "hashmap";
+import {MessageData, MessageBuilder} from "@/scripts/data/MessageData";
+import {sprintf} from "sprintf-js";
 
 export class Variant {
 
@@ -100,5 +102,12 @@ export class Variant {
         }
 
         return 0;
+    }
+
+    public generateMessage(): MessageData {
+        return new MessageBuilder()
+            .addItem('Generation Number', this.generationNumber.toString())
+            .addItem('Fitness', sprintf("%1.3f", this.fitness))
+            .buildMessage();
     }
 }
