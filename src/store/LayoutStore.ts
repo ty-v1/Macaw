@@ -5,6 +5,8 @@ import {DefaultNodeColor} from "@/scripts/network/node/strategy/color/DefaultNod
 import {DefaultNodePosition} from "@/scripts/network/node/strategy/position/DefaultNodePosition";
 import {DefaultNodeSize} from "@/scripts/network/node/strategy/size/DefaultNodeSize";
 import {DefaultNodeShape} from "@/scripts/network/node/strategy/shape/DefaultNodeShape";
+import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
+import {GraphEdgeSet} from "@/scripts/data/network/GraphEdgeSet";
 
 export interface LayoutStoreState {
     layoutStrategy: LayoutFactory,
@@ -36,7 +38,6 @@ const getters = {
 };
 
 const mutations = {
-
     setNodeColorStrategy: (state, payload) =>
         state.layoutStrategy.setNodeColorStrategy(payload.nodeColorStrategy),
 
@@ -56,6 +57,23 @@ const mutations = {
                                   payload.generationNumberToVariantCount,
                                   30,
                                   20);
+    },
+
+    setElementHighlightState: (state, payload) => {
+        const id: string = payload.id;
+        const highlightState: boolean = payload.highlightState;
+        const nodes: GraphNodeSet = state.layout.nodes;
+        const edges: GraphEdgeSet = state.layout.edges;
+
+        if (nodes.has(id)) {
+            const node: GraphNode = nodes.get(id);
+            node.highlighted = highlightState;
+        }
+
+        if (edges.has(id)) {
+            const edge: GraphNode = nodes.get(id);
+            edge.highlighted = highlightState;
+        }
     },
 
     // TODO Nodeのクラスを変更する
