@@ -19,7 +19,7 @@ const mutations = {
         const variantId: string = payload.variantId;
         if (!state.variantIdSet.has(variantId)) {
             state.variantIdSet.add(variantId);
-            state.variantIds = Array.from(state.variantIdSet);
+            state.variantIds = Array.from(state.variantIdSet).reverse();
         }
     },
     deleteVariantId: (state, payload) => {
