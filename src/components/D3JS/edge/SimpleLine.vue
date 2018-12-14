@@ -19,7 +19,7 @@
 
 <style scoped>
     .highlighted {
-        stroke: greenyellow;
+        stroke: darkgreen;
         stroke-width: 4px;
     }
 </style>
