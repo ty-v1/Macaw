@@ -5,11 +5,22 @@
                  :height="SVGHeight"
                  class="svg"
                  @click="onClick">
+                <defs>
+                    <filter id="double">
+                        <feMorphology in="SourceGraphic" result="a" operator="dilate" radius="1"></feMorphology>
+                        <feComposite in="SourceGraphic" in2="a" result="xx" operator="xor"></feComposite>
+                    </filter>
+                </defs>
                 <g transform="translate(20, 20)">
                     <SimpleLine v-for="edge in simpleLine"
                                 :key="edge.id"
                                 :edge="edge">
                     </SimpleLine>
+
+                    <DoubleLine v-for="edge in doubleLine"
+                                :key="edge.id"
+                                :edge="edge">
+                    </DoubleLine>
 
                     <CircleNode v-for="node in circleNode"
                                 :key="node.id"
@@ -48,8 +59,9 @@
     import Popup from "../Popup.vue";
     import {NodeMouseOverEvent} from "../../scripts/event/NodeMouseOverEvent";
     import {LEFT_BUTTON, NodeClickEvent, RIGHT_BUTTON} from "../../scripts/event/NodeClickEvent";
+    import DoubleLine from "./edge/DoubleLine.vue";
 
-    @Component({components: {Popup, SimpleLine, CrossNode, CircleNode}})
+    @Component({components: {DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
         /**
          * data
@@ -79,7 +91,15 @@
         }
 
         get simpleLine(): GraphEdge[] {
-            return this.$store.getters['LayoutStore/allEdges'];
+            const filter = (edge: GraphEdge) => edge.pattern !== 'double-line';
+
+            return this.$store.getters['LayoutStore/filteredEdges'](filter);
+        }
+
+        get doubleLine(): GraphEdge[] {
+            const filter = (edge: GraphEdge) => edge.pattern === 'double-line';
+
+            return this.$store.getters['LayoutStore/filteredEdges'](filter);
         }
 
         get SVGWidth() {
@@ -157,7 +177,7 @@
             });
         }
 
-        onClick(event : MouseEvent){
+        onClick(event: MouseEvent) {
             this.$store.commit('LayoutStore/resetElementHighlightState', {});
         }
 
