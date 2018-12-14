@@ -62,6 +62,8 @@ export class LayoutFactory {
         const edges =
             this.calculateEdge(variants, maxGenerationNumber, nodes);
 
+        this.setNodeToIOEdge(nodes, edges);
+
         // SVG領域の計算
         const width = nodes.getMaxX() + marginX * 2;
         const height = nodes.getMaxY() + marginY * 2;
@@ -87,7 +89,9 @@ export class LayoutFactory {
                 height: 0,
                 shape: 'none',
                 color: Color.BLACK,
-                highlighted: false
+                highlighted: false,
+                inEdgeIds: [],
+                outEdgeIds: []
             };
             nodes.add(node);
         });
@@ -109,7 +113,6 @@ export class LayoutFactory {
             variant.getParentIds()
                    .forEach((parentId) => {
                        const sourceNode = nodes.get(parentId);
-                       // TODO ここにsourceとtargetのidを入れておく
                        const edge: GraphEdge = {
                            id: "e" + edges.size(),
                            sourceX: sourceNode.x + sourceNode.width,
@@ -125,5 +128,16 @@ export class LayoutFactory {
                    });
         });
         return edges;
+    }
+
+    private setNodeToIOEdge(nodes: GraphNodeSet, edges: GraphEdgeSet): void {
+        edges.values()
+             .forEach((edge) => {
+                 const sourceNode = nodes.get(edge.sourceId);
+                 const targetNode = nodes.get(edge.targetId);
+
+                 sourceNode.outEdgeIds.push(edge.id);
+                 targetNode.inEdgeIds.push(edge.id);
+             });
     }
 }

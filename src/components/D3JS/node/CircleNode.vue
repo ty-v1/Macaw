@@ -4,10 +4,11 @@
                 cx="1"
                 cy="1"
                 :fill="color"
-                :class="(node.highlighted)? 'highlighted' : ''"
+                :class="{highlighted : node.highlighted}"
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
                 @click="onClick"
+                @contextmenu="onContextMenu"
         ></circle>
     </g>
 </template>
@@ -40,17 +41,27 @@
 
         @Emit('node-click')
         public onClick(event: MouseEvent): NodeClickEvent {
+            event.stopPropagation();
             return {
                 id: this.node.id,
                 buttons: event.buttons
             };
         }
+
+        @Emit('node-click')
+        public onContextMenu(event : MouseEvent): NodeClickEvent {
+            event.preventDefault();
+            return {
+                id: this.node.id,
+                buttons: 2
+            };
+        }
     }
 </script>
 
-<style>
+<style scoped>
     .highlighted {
-        stroke: #000000;
+        stroke: darkgreen;
         stroke-width: 4px;
     }
 </style>

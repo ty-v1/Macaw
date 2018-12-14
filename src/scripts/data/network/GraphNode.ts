@@ -9,4 +9,6 @@ export type GraphNode = {
     height: number,
     shape: string,
     highlighted: boolean,
+    inEdgeIds: string[],
+    outEdgeIds: string[]
 }

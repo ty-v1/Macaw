@@ -15,7 +15,7 @@ const getters = {
 
 const mutations = {
     addVariantId: (state, payload) => {
-        console.log(state.variantIdSet);
+
         const variantId: string = payload.variantId;
         if (!state.variantIdSet.has(variantId)) {
             state.variantIdSet.add(variantId);

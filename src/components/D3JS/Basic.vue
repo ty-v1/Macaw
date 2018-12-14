@@ -1,7 +1,10 @@
 <template>
     <div class="content">
         <div class="svg-wrapper">
-            <svg :width="SVGWidth" :height="SVGHeight" class="svg">
+            <svg :width="SVGWidth"
+                 :height="SVGHeight"
+                 class="svg"
+                 @click="onClick">
                 <g transform="translate(20, 20)">
                     <SimpleLine v-for="edge in simpleLine"
                                 :key="edge.id"
@@ -112,12 +115,13 @@
         }
 
         onNodeClick(event: NodeClickEvent) {
+
             switch (event.buttons) {
                 case LEFT_BUTTON:
                     this.onLeftButtonClicked(event.id);
                     break;
                 case RIGHT_BUTTON:
-                    this.onRightButtonClicked();
+                    this.onRightButtonClicked(event.id);
                     break;
                 default:
             }
@@ -125,7 +129,6 @@
 
         private onLeftButtonClicked(id: string) {
 
-            console.log(this.$store.getters['DiffStore/contain'](id));
             if (this.$store.getters['DiffStore/contain'](id)) {
                 this.$store.commit('DiffStore/deleteVariantId', {
                     variantId: id
@@ -146,8 +149,16 @@
             }
         }
 
-        private onRightButtonClicked() {
-            this.$store.commit('LayoutStore/resetElementHighlightState');
+        private onRightButtonClicked(id: string) {
+            // 経路をハイライトする
+            this.$store.commit('LayoutStore/resetElementHighlightState', {});
+            this.$store.commit('LayoutStore/highlightAncestryTree', {
+                id: id
+            });
+        }
+
+        onClick(event : MouseEvent){
+            this.$store.commit('LayoutStore/resetElementHighlightState', {});
         }
 
         /**
@@ -188,8 +199,6 @@
             // ウォッチャをリセットする
             this.unwatch();
         }
-
-        private
 
         apply() {
             const variants: Variant[] = this.$store.getters['VariantStore/variants'];
