@@ -4,7 +4,7 @@
                 cx="1"
                 cy="1"
                 :fill="color"
-                :class="(isClicked)? 'highlighted' : ''"
+                :class="(node.highlighted)? 'highlighted' : ''"
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
                 @click="onClick"
@@ -20,10 +20,6 @@
 
     @Component
     export default class CircleNode extends NodeComponentBase {
-        /**
-         * data
-         * */
-        isClicked = false;
 
         @Emit('node-mouse-over')
         public onMouseOver(event: MouseEvent): NodeMouseOverEvent {
@@ -43,11 +39,10 @@
         }
 
         @Emit('node-click')
-        public onClick(): NodeClickEvent {
-            this.isClicked = !this.isClicked;
+        public onClick(event: MouseEvent): NodeClickEvent {
             return {
                 id: this.node.id,
-                isClicked: this.isClicked
+                buttons: event.buttons
             };
         }
     }

@@ -25,7 +25,8 @@ export class GraphNodeSet {
                 width: 0,
                 height: 0,
                 color: Color.BLACK,
-                shape: "none"
+                shape: "none",
+                highlighted: false
             };
         }
     }
@@ -77,5 +78,9 @@ export class GraphNodeSet {
                 }
             });
         return max;
+    }
+
+    public has(id: string): boolean {
+        return this.idToNode.has(id);
     }
 }

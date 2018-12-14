@@ -27,6 +27,7 @@ export class GraphEdgeSet {
                 color: Color.BLACK,
                 sourceId: "null",
                 targetId: "null",
+                highlighted: false
             };
         }
     }
@@ -37,5 +38,9 @@ export class GraphEdgeSet {
 
     public values(): GraphEdge[] {
         return this.idToEdge.values();
+    }
+
+    public has(id: string): boolean {
+        return this.idToEdge.has(id);
     }
 }
