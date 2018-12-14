@@ -4,7 +4,7 @@
                 cx="1"
                 cy="1"
                 :fill="color"
-                :class="(node.highlighted)? 'highlighted' : ''"
+                :class="{highlighted : node.highlighted}"
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
                 @click="onClick"
@@ -48,9 +48,9 @@
     }
 </script>
 
-<style>
+<style scoped>
     .highlighted {
-        stroke: #000000;
+        stroke: greenyellow;
         stroke-width: 4px;
     }
 </style>
