@@ -122,12 +122,31 @@ export class LayoutFactory {
                            color: Color.BLACK,
                            sourceId: sourceNode.id,
                            targetId: targetNode.id,
+                           pattern: this.getEdgePattern(variant, parentId),
                            highlighted: false
                        };
                        edges.add(edge);
                    });
         });
         return edges;
+    }
+
+    private getEdgePattern(variant: Variant, parentId: string): string {
+
+        switch (variant.getOperation(parentId).operationName) {
+            case "select":
+                return "";
+            case "insert":
+                return "equal-distance-dash";
+            case "delete":
+                return "long-short-dash";
+            case "replace":
+                return "long-middle-dash";
+            case "crossover":
+                return "double-line";
+            default:
+                return "";
+        }
     }
 
     private setNodeToIOEdge(nodes: GraphNodeSet, edges: GraphEdgeSet): void {

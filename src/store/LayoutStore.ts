@@ -7,6 +7,7 @@ import {DefaultNodeSize} from "@/scripts/network/node/strategy/size/DefaultNodeS
 import {DefaultNodeShape} from "@/scripts/network/node/strategy/shape/DefaultNodeShape";
 import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 import {GraphEdgeSet} from "@/scripts/data/network/GraphEdgeSet";
+import {GraphEdge} from "@/scripts/data/network/GraphEdge";
 
 export interface LayoutStoreState {
     layoutStrategy: LayoutFactory,
@@ -31,6 +32,10 @@ const getters = {
     filteredNodes: state =>
         (filter: (node: GraphNode) => boolean) =>
             (state.layout !== null) ? state.layout.nodes.filter(filter) : [],
+
+    filteredEdges: state =>
+        (filter: (edge: GraphEdge) => boolean) =>
+            (state.layout !== null) ? state.layout.edges.filter(filter) : [],
 
     svgHeight: state => (state.layout !== null) ? state.layout.height : 0,
 
