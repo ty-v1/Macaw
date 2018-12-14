@@ -44,7 +44,7 @@
     import {Variant} from "../../scripts/data/Variant";
     import Popup from "../Popup.vue";
     import {NodeMouseOverEvent} from "../../scripts/event/NodeMouseOverEvent";
-    import {NodeClickEvent} from "../../scripts/event/NodeClickEvent";
+    import {LEFT_BUTTON, NodeClickEvent, RIGHT_BUTTON} from "../../scripts/event/NodeClickEvent";
 
     @Component({components: {Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
@@ -112,18 +112,42 @@
         }
 
         onNodeClick(event: NodeClickEvent) {
-            if (event.isClicked) {
-                this.$store.commit('DiffStore/addVariantId',
-                                   {
-                                       variantId: event.id
-                                   });
+            switch (event.buttons) {
+                case LEFT_BUTTON:
+                    this.onLeftButtonClicked(event.id);
+                    break;
+                case RIGHT_BUTTON:
+                    this.onRightButtonClicked();
+                    break;
+                default:
+            }
+        }
+
+        private onLeftButtonClicked(id: string) {
+
+            console.log(this.$store.getters['DiffStore/contain'](id));
+            if (this.$store.getters['DiffStore/contain'](id)) {
+                this.$store.commit('DiffStore/deleteVariantId', {
+                    variantId: id
+                });
+                this.$store.commit('LayoutStore/setElementHighlightState', {
+                    id: id,
+                    highlightState: false
+                });
 
             } else {
-                this.$store.commit('DiffStore/deleteVariantId',
-                                   {
-                                       variantId: event.id
-                                   });
+                this.$store.commit('DiffStore/addVariantId', {
+                    variantId: id
+                });
+                this.$store.commit('LayoutStore/setElementHighlightState', {
+                    id: id,
+                    highlightState: true
+                });
             }
+        }
+
+        private onRightButtonClicked() {
+            this.$store.commit('LayoutStore/resetElementHighlightState');
         }
 
         /**
@@ -165,7 +189,9 @@
             this.unwatch();
         }
 
-        private apply() {
+        private
+
+        apply() {
             const variants: Variant[] = this.$store.getters['VariantStore/variants'];
             const maxGenerationNumber: number
                 = this.$store.getters['VariantStore/maxGenerationNumber'];
