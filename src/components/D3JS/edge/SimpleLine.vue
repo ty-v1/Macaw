@@ -1,11 +1,13 @@
 <template>
-    <line :x1="sourceX"
-          :y1="sourceY"
-          :x2="targetX"
-          :y2="targetY"
-          fill="none"
-          :class="{highlighted : edge.highlighted}">
-    </line>
+    <g>
+        <line :x1="sourceX"
+              :y1="sourceY"
+              :x2="targetX"
+              :y2="targetY"
+              fill="none"
+              :class="[edge.pattern, {highlighted : edge.highlighted}]">
+        </line>
+    </g>
 </template>
 
 <script lang="ts">
@@ -21,5 +23,17 @@
     .highlighted {
         stroke: darkgreen;
         stroke-width: 4px;
+    }
+
+    .equal-distance-dash {
+        stroke-dasharray: 4, 4
+    }
+
+    .long-short-dash {
+        stroke-dasharray: 24, 3, 2, 3
+    }
+
+    .long-middle-dash {
+        stroke-dasharray: 24, 20
     }
 </style>
