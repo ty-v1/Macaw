@@ -8,6 +8,7 @@
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
                 @click="onClick"
+                @contextmenu="onContextMenu"
         ></circle>
     </g>
 </template>
@@ -40,9 +41,19 @@
 
         @Emit('node-click')
         public onClick(event: MouseEvent): NodeClickEvent {
+            event.stopPropagation();
             return {
                 id: this.node.id,
                 buttons: event.buttons
+            };
+        }
+
+        @Emit('node-click')
+        public onContextMenu(event : MouseEvent): NodeClickEvent {
+            event.preventDefault();
+            return {
+                id: this.node.id,
+                buttons: 2
             };
         }
     }
