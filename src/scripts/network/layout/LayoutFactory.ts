@@ -86,7 +86,8 @@ export class LayoutFactory {
                 width: 0,
                 height: 0,
                 shape: 'none',
-                color: Color.BLACK
+                color: Color.BLACK,
+                highlighted: false
             };
             nodes.add(node);
         });
@@ -117,7 +118,8 @@ export class LayoutFactory {
                            targetY: targetNode.y,
                            color: Color.BLACK,
                            sourceId: sourceNode.id,
-                           targetId: targetNode.id
+                           targetId: targetNode.id,
+                           highlighted: false
                        };
                        edges.add(edge);
                    });
