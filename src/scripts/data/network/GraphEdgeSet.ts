@@ -14,6 +14,19 @@ export class GraphEdgeSet {
         this.idToEdge.set(edge.id, edge);
     }
 
+    public filter(f: (edge: GraphEdge) => boolean): GraphEdge[] {
+        const edges: GraphEdge[] = [];
+
+        this.idToEdge.values()
+            .forEach((edge) => {
+                if (f(edge)) {
+                    edges.push(edge);
+                }
+            });
+
+        return edges;
+    }
+
     public get(id: string): GraphEdge {
         if (this.idToEdge.has(id)) {
             return this.idToEdge.get(id);
@@ -27,6 +40,7 @@ export class GraphEdgeSet {
                 color: Color.BLACK,
                 sourceId: "null",
                 targetId: "null",
+                pattern: "none",
                 highlighted: false
             };
         }
