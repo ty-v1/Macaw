@@ -76,6 +76,22 @@ const mutations = {
         }
     },
 
+    resetElementHighlightState: (state, {}) => {
+
+        const nodes: GraphNodeSet = state.layout.nodes;
+        const edges: GraphEdgeSet = state.layout.edges;
+
+        nodes.values()
+             .forEach((node) => {
+                 node.highlighted = false;
+             });
+
+        edges.values()
+             .forEach((edge) => {
+                 edge.highlighted = false;
+             });
+    },
+
     // TODO Nodeのクラスを変更する
     changeNodeClass: (state, payload) => {
 
