@@ -26,7 +26,9 @@ export class GraphNodeSet {
                 height: 0,
                 color: Color.BLACK,
                 shape: "none",
-                highlighted: false
+                highlighted: false,
+                inEdgeIds: [],
+                outEdgeIds: []
             };
         }
     }
