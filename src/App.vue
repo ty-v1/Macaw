@@ -5,9 +5,9 @@
          @dragend="onDragEnd"
          @drop="onDrop">
         <div id="nav">
-            <router-link to="/">Network Graph</router-link>
+            <router-link to="/">Tree</router-link>
             |
-            <router-link to="/about">Line Graph</router-link>
+            <router-link to="/about">Line Chart</router-link>
         </div>
         <div style="height: 90%;">
             <router-view></router-view>
