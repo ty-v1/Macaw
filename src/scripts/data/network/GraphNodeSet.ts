@@ -38,8 +38,6 @@ export class GraphNodeSet {
     }
 
     public values(): GraphNode[] {
-        const a: number[] = [];
-
         return this.idToNode.values();
     }
 
