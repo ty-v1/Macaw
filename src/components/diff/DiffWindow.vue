@@ -1,8 +1,6 @@
 <template>
     <div class="content">
-        <DiffList v-for="variantId in variantIds"
-                  :key="variantId"
-                  :variant-id="variantId">
+        <DiffList :variant-id="variantId">
         </DiffList>
     </div>
 </template>
@@ -18,7 +16,7 @@
             computed: {
                 ...mapGetters(
                     {
-                        variantIds: 'DiffStore/variantIds'
+                        variantId: 'DiffStore/variantId'
                     }),
             },
         })

@@ -1,38 +1,19 @@
 export interface DiffStoreState {
-    variantIds: string[],
-    variantIdSet: Set<string>
+    variantId: string,
 }
 
 const state: DiffStoreState = {
-    variantIds: [],
-    variantIdSet: new Set<string>()
+    variantId: ''
 };
 
 const getters = {
-    variantIds: state => state.variantIds,
-    contain: state => (variantId: string) => state.variantIdSet.has(variantId)
+    variantId: state => state.variantId
 };
 
 const mutations = {
-    addVariantId: (state, payload) => {
-
-        const variantId: string = payload.variantId;
-        if (!state.variantIdSet.has(variantId)) {
-            state.variantIdSet.add(variantId);
-            state.variantIds = Array.from(state.variantIdSet).reverse();
-        }
-    },
-    deleteVariantId: (state, payload) => {
-        const variantId: string = payload.variantId;
-
-        if (state.variantIdSet.has(variantId)) {
-            state.variantIdSet.delete(variantId);
-            state.variantIds = Array.from(state.variantIdSet);
-        }
-    },
+    setVariantId: (state, payload) => state.variantId = payload.variantId,
     reset: state => {
-        state.variantIdSet.clear();
-        state.variantIds = [];
+        state.variantId = '';
     }
 };
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="diff-list-wrapper">
+    <div class="diff-list-wrapper" v-if="variantId !== ''">
         <button @click="onClick">Close</button>
         <div>
             <p>Generation Number : {{getGenerationNumber}}</p>
@@ -58,10 +58,7 @@
         },
         methods: {
             onClick: function () {
-                this.$store.commit('DiffStore/deleteVariantId',
-                    {
-                        variantId: this.variantId
-                    });
+                this.$store.commit('DiffStore/reset', {});
             }
         }
     }

@@ -148,18 +148,17 @@
         }
 
         private onLeftButtonClicked(id: string) {
+            const variantId: string = this.$store.getters['DiffStore/variantId'];
 
-            if (this.$store.getters['DiffStore/contain'](id)) {
-                this.$store.commit('DiffStore/deleteVariantId', {
-                    variantId: id
-                });
+            if (variantId !== '') {
+                this.$store.commit('DiffStore/reset', {});
                 this.$store.commit('LayoutStore/setElementHighlightState', {
                     id: id,
                     highlightState: false
                 });
 
             } else {
-                this.$store.commit('DiffStore/addVariantId', {
+                this.$store.commit('DiffStore/setVariantId', {
                     variantId: id
                 });
                 this.$store.commit('LayoutStore/setElementHighlightState', {
