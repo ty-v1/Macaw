@@ -58,10 +58,7 @@
         },
         methods: {
             onClick: function () {
-                this.$store.commit('DiffStore/deleteVariantId',
-                    {
-                        variantId: this.variantId
-                    });
+                this.$store.commit('DiffStore/reset', {});
             }
         }
     }
