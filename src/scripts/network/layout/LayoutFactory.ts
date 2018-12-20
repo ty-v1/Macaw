@@ -91,7 +91,8 @@ export class LayoutFactory {
                 color: Color.BLACK,
                 highlighted: false,
                 inEdgeIds: [],
-                outEdgeIds: []
+                outEdgeIds: [],
+                class: ''
             };
             nodes.add(node);
         });
@@ -123,7 +124,8 @@ export class LayoutFactory {
                            sourceId: sourceNode.id,
                            targetId: targetNode.id,
                            pattern: this.getEdgePattern(variant, parentId),
-                           highlighted: false
+                           highlighted: false,
+                           class: ''
                        };
                        edges.add(edge);
                    });

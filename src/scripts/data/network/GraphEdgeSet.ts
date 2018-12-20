@@ -41,7 +41,8 @@ export class GraphEdgeSet {
                 sourceId: "null",
                 targetId: "null",
                 pattern: "none",
-                highlighted: false
+                highlighted: false,
+                class: ''
             };
         }
     }

@@ -115,10 +115,22 @@ const mutations = {
     // TODO Nodeのクラスを変更する
     changeNodeClass: (state, payload) => {
 
+
     },
 
     // TODO Nodeのクラスをリセットする
     resetNodeClass: (state, payload) => {
+
+    },
+
+    // TODO Nodeのクラスを変更する
+    changeEdgeClass: (state, payload) => {
+
+
+    },
+
+    // TODO Nodeのクラスをリセットする
+    resetEdgeClass: (state, payload) => {
 
     }
 };

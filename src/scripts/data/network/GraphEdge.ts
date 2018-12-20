@@ -10,5 +10,6 @@ export type GraphEdge = {
     sourceId: string,
     targetId: string,
     pattern: string,
-    highlighted: boolean
+    highlighted: boolean,
+    class: string
 }

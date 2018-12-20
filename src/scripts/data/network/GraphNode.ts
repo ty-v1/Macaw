@@ -10,5 +10,6 @@ export type GraphNode = {
     shape: string,
     highlighted: boolean,
     inEdgeIds: string[],
-    outEdgeIds: string[]
+    outEdgeIds: string[],
+    class: string
 }

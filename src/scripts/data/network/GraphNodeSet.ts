@@ -28,7 +28,8 @@ export class GraphNodeSet {
                 shape: "none",
                 highlighted: false,
                 inEdgeIds: [],
-                outEdgeIds: []
+                outEdgeIds: [],
+                class: ''
             };
         }
     }
