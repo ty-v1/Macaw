@@ -4,11 +4,14 @@ import {INodeColorStrategy} from "@/scripts/network/node/strategy/color/INodeCol
 import {INodePositionStrategy} from "@/scripts/network/node/strategy/position/INodePositionStrategy";
 import {INodeSizeStrategy} from "@/scripts/network/node/strategy/size/INodeSizeStrategy";
 import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
-import {GraphNode} from "@/scripts/data/network/GraphNode";
-import {Color} from "@/scripts/color/Color";
 import {GraphEdgeSet} from "@/scripts/data/network/GraphEdgeSet";
 import {GraphEdge} from "@/scripts/data/network/GraphEdge";
 import {INodeShapeStrategy} from "@/scripts/network/node/strategy/shape/INodeShapeStrategy";
+import {GraphEdgeBuilder} from "@/scripts/data/network/GraphEdgeBuilder";
+import HashMap from "hashmap";
+import {NodeDatum} from "@/scripts/data/network/GraphNode";
+import {Color} from "@/scripts/color/Color";
+import {GraphNodeBuilder} from "@/scripts/data/network/GraphNodeBuilder";
 
 export class LayoutFactory {
 
@@ -78,28 +81,40 @@ export class LayoutFactory {
 
     private calculateNode(variants: Variant[],
                           maxGenerationNumber: number): GraphNodeSet {
-        const nodes = new GraphNodeSet();
+        const nodeData: HashMap<string, NodeDatum> = new HashMap<string, NodeDatum>();
+
         // 各ノードの初期化
         variants.forEach((variant) => {
-            const node: GraphNode = {
-                id: variant.getId(),
+            const node: NodeDatum = {
                 x: 0,
                 y: 0,
                 width: 0,
                 height: 0,
-                shape: 'none',
                 color: Color.BLACK,
-                highlighted: false,
-                inEdgeIds: [],
-                outEdgeIds: [],
-                class: ''
+                shape: ''
             };
-            nodes.add(node);
+            nodeData.set(variant.getId(), node);
         });
-        this.nodeShapeStrategy.exec(variants, maxGenerationNumber, nodes);
-        this.nodeColorStrategy.exec(variants, maxGenerationNumber, nodes);
-        this.nodeSizeStrategy.exec(variants, maxGenerationNumber, nodes);
-        this.nodePositionStrategy.exec(variants, maxGenerationNumber, 25, 150, nodes);
+        this.nodeShapeStrategy.exec(variants, maxGenerationNumber, nodeData);
+        this.nodeColorStrategy.exec(variants, maxGenerationNumber, nodeData);
+        this.nodeSizeStrategy.exec(variants, maxGenerationNumber, nodeData);
+        this.nodePositionStrategy.exec(variants, maxGenerationNumber, 25, 150, nodeData);
+
+        const nodes = new GraphNodeSet();
+
+        nodeData.keys()
+                .forEach((key) => {
+                    const nodeDatum: NodeDatum = nodeData.get(key);
+                    const node = new GraphNodeBuilder().setId(key)
+                                                       .setX(nodeDatum.x)
+                                                       .setY(nodeDatum.y)
+                                                       .setWidth(nodeDatum.width)
+                                                       .setHeight(nodeDatum.height)
+                                                       .setColor(nodeDatum.color)
+                                                       .setShape(nodeDatum.shape)
+                                                       .build();
+                    nodes.add(node);
+                });
 
         return nodes;
     }
@@ -114,19 +129,16 @@ export class LayoutFactory {
             variant.getParentIds()
                    .forEach((parentId) => {
                        const sourceNode = nodes.get(parentId);
-                       const edge: GraphEdge = {
-                           id: "e" + edges.size(),
-                           sourceX: sourceNode.x + sourceNode.width,
-                           sourceY: sourceNode.y + sourceNode.height * 2,
-                           targetX: targetNode.x + targetNode.width,
-                           targetY: targetNode.y,
-                           color: Color.BLACK,
-                           sourceId: sourceNode.id,
-                           targetId: targetNode.id,
-                           pattern: this.getEdgePattern(variant, parentId),
-                           highlighted: false,
-                           class: ''
-                       };
+                       const edge: GraphEdge
+                           = new GraphEdgeBuilder().setId('e' + edges.size())
+                                                   .setSourceX(sourceNode.getX() + sourceNode.getWidth())
+                                                   .setSourceY(sourceNode.getY() + sourceNode.getHeight() * 2)
+                                                   .setTargetX(targetNode.getX() + targetNode.getWidth())
+                                                   .setTargetY(targetNode.getY())
+                                                   .setSourceId(sourceNode.getId())
+                                                   .setTargetId(targetNode.getId())
+                                                   .setPattern(this.getEdgePattern(variant, parentId))
+                                                   .build();
                        edges.add(edge);
                    });
         });
@@ -154,11 +166,11 @@ export class LayoutFactory {
     private setNodeToIOEdge(nodes: GraphNodeSet, edges: GraphEdgeSet): void {
         edges.values()
              .forEach((edge) => {
-                 const sourceNode = nodes.get(edge.sourceId);
-                 const targetNode = nodes.get(edge.targetId);
+                 const sourceNode = nodes.get(edge.getSourceId());
+                 const targetNode = nodes.get(edge.getTargetId());
 
-                 sourceNode.outEdgeIds.push(edge.id);
-                 targetNode.inEdgeIds.push(edge.id);
+                 sourceNode.addOutEdgeId(edge.getId());
+                 targetNode.addInEdgeId(edge.getId());
              });
     }
 }

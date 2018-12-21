@@ -9,15 +9,15 @@ export default class NodeComponentBase extends Vue {
     @Prop() node!: GraphNode;
 
     get transform(): string {
-        const x: number = this.node.x;
-        const y: number = this.node.y;
-        const width: number = this.node.width;
-        const height: number = this.node.height;
+        const x: number = this.node.getX();
+        const y: number = this.node.getY();
+        const width: number = this.node.getWidth();
+        const height: number = this.node.getHeight();
 
         return sprintf("translate(%d, %d)scale(%d, %d)", x, y, width, height);
     }
 
     get color(): string {
-        return this.node.color.toString();
+        return this.node.getColor().toString();
     }
 }

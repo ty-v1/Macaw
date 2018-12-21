@@ -141,14 +141,15 @@ function highlightAncestor(id: string, nodes: GraphNodeSet, edges: GraphEdgeSet)
         node.highlighted = true;
 
         // 祖先に繋がる辺をハイライトする
-        node.inEdgeIds.forEach((inEdgeId) => {
-            highlightAncestor(inEdgeId, nodes, edges);
-        });
+        node.getInEdgeIds()
+            .forEach((inEdgeId) => {
+                highlightAncestor(inEdgeId, nodes, edges);
+            });
     } else if (edges.has(id)) {
         const edge = edges.get(id);
         edge.highlighted = true;
 
-        highlightAncestor(edge.sourceId, nodes, edges);
+        highlightAncestor(edge.getSourceId(), nodes, edges);
     }
 }
 
@@ -158,14 +159,15 @@ function highlightDescendant(id: string, nodes: GraphNodeSet, edges: GraphEdgeSe
         node.highlighted = true;
 
         // 子孫に繋がる辺をハイライトする
-        node.outEdgeIds.forEach((outEdgeId) => {
-            highlightDescendant(outEdgeId, nodes, edges);
-        });
+        node.getOutEdgeIds()
+            .forEach((outEdgeId) => {
+                highlightDescendant(outEdgeId, nodes, edges);
+            });
     } else if (edges.has(id)) {
         const edge = edges.get(id);
         edge.highlighted = true;
 
-        highlightDescendant(edge.targetId, nodes, edges);
+        highlightDescendant(edge.getTargetId(), nodes, edges);
     }
 }
 

@@ -1,6 +1,7 @@
 import {INodeSizeStrategy} from "@/scripts/network/node/strategy/size/INodeSizeStrategy";
 import {Variant} from "@/scripts/data/Variant";
-import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
+import HashMap from "hashmap";
+import {NodeDatum} from "@/scripts/data/network/GraphNode";
 
 export class FixedNodeSize implements INodeSizeStrategy {
 
@@ -14,11 +15,11 @@ export class FixedNodeSize implements INodeSizeStrategy {
 
     exec(variants: Variant[],
          maxGenerationNumber: number,
-         nodes: GraphNodeSet) {
+         nodeData: HashMap<string, NodeDatum>) {
 
         variants.forEach((variant) => {
 
-            const node = nodes.get(variant.getId());
+            const node = nodeData.get(variant.getId());
             node.width = this.nodeWidth;
             node.height = this.nodeHeight;
         });
