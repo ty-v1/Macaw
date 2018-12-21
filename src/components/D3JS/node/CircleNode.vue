@@ -8,7 +8,6 @@
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
                 @click="onClick"
-                @contextmenu="onContextMenu"
         ></circle>
     </g>
 </template>
@@ -47,19 +46,15 @@
                 buttons: event.buttons
             };
         }
-
-        @Emit('node-click')
-        public onContextMenu(event: MouseEvent): NodeClickEvent {
-            event.preventDefault();
-            return {
-                id: this.node.getId(),
-                buttons: 2
-            };
-        }
     }
 </script>
 
 <style scoped>
+    .selected {
+        stroke: cornflowerblue;
+        stroke-width: 4px;
+    }
+
     .highlight {
         stroke: darkgreen;
         stroke-width: 4px;

@@ -59,6 +59,8 @@
         methods: {
             onClick: function () {
                 this.$store.commit('DiffStore/reset', {});
+                this.$store.commit('LayoutStore/clearNodeClass', {});
+                this.$store.commit('LayoutStore/clearEdgeClass', {});
             }
         }
     }
