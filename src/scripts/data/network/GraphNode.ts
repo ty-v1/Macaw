@@ -8,7 +8,6 @@ export class GraphNode {
     private readonly width: number;
     private readonly height: number;
     private readonly shape: string;
-    public highlighted: boolean = false;
     private readonly inEdgeIds: string[] = [];
     private readonly outEdgeIds: string[] = [];
     private cssClasses: string[] = [];
@@ -54,10 +53,6 @@ export class GraphNode {
         return this.shape;
     }
 
-    public isHighlighted(): boolean {
-        return this.highlighted;
-    }
-
     public getInEdgeIds(): string[] {
         return this.inEdgeIds;
     }
@@ -80,7 +75,9 @@ export class GraphNode {
     }
 
     public addCSSClass(cssClass: string): void {
-        this.cssClasses.push(cssClass);
+        if (!this.hasCSSClass(cssClass)) {
+            this.cssClasses.push(cssClass);
+        }
     }
 
     public removeCSSClass(cssClass: string): void {
@@ -89,6 +86,15 @@ export class GraphNode {
 
     public clearCSSClasses(): void {
         this.cssClasses = [];
+    }
+
+    private hasCSSClass(cssClass: string): boolean {
+        for (let i = 0; i < this.cssClasses.length; i++) {
+            if (this.cssClasses[i] === cssClass) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

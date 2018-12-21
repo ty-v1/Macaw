@@ -64,39 +64,6 @@ const mutations = {
                                   20);
     },
 
-    setElementHighlightState: (state, payload) => {
-        const id: string = payload.id;
-        const highlightState: boolean = payload.highlightState;
-        const nodes: GraphNodeSet = state.layout.nodes;
-        const edges: GraphEdgeSet = state.layout.edges;
-
-        if (nodes.has(id)) {
-            const node: GraphNode = nodes.get(id);
-            node.highlighted = highlightState;
-        }
-
-        if (edges.has(id)) {
-            const edge: GraphNode = nodes.get(id);
-            edge.highlighted = highlightState;
-        }
-    },
-
-    resetElementHighlightState: (state, {}) => {
-
-        const nodes: GraphNodeSet = state.layout.nodes;
-        const edges: GraphEdgeSet = state.layout.edges;
-
-        nodes.values()
-             .forEach((node) => {
-                 node.highlighted = false;
-             });
-
-        edges.values()
-             .forEach((edge) => {
-                 edge.highlighted = false;
-             });
-    },
-
     highlightAncestryTree: (state, payload) => {
         const id: string = payload.id;
 
@@ -112,33 +79,26 @@ const mutations = {
         highlightDescendant(id, nodes, edges);
     },
 
-    // TODO Nodeのクラスを変更する
-    changeNodeClass: (state, payload) => {
+    clearNodeClass: (state, payload) => {
 
-
+        state.layout.nodes.values()
+             .forEach((node) => {
+                 node.clearCSSClasses();
+             });
     },
 
-    // TODO Nodeのクラスをリセットする
-    resetNodeClass: (state, payload) => {
-
-    },
-
-    // TODO Nodeのクラスを変更する
-    changeEdgeClass: (state, payload) => {
-
-
-    },
-
-    // TODO Nodeのクラスをリセットする
-    resetEdgeClass: (state, payload) => {
-
+    clearEdgeClass: (state, payload) => {
+        state.layout.edges.values()
+             .forEach((edge) => {
+                 edge.clearCSSClasses();
+             });
     }
 };
 
 function highlightAncestor(id: string, nodes: GraphNodeSet, edges: GraphEdgeSet) {
     if (nodes.has(id)) {
         const node = nodes.get(id);
-        node.highlighted = true;
+        node.addCSSClass('highlight');
 
         // 祖先に繋がる辺をハイライトする
         node.getInEdgeIds()
@@ -147,7 +107,7 @@ function highlightAncestor(id: string, nodes: GraphNodeSet, edges: GraphEdgeSet)
             });
     } else if (edges.has(id)) {
         const edge = edges.get(id);
-        edge.highlighted = true;
+        edge.addCSSClass('highlight');
 
         highlightAncestor(edge.getSourceId(), nodes, edges);
     }
@@ -156,7 +116,7 @@ function highlightAncestor(id: string, nodes: GraphNodeSet, edges: GraphEdgeSet)
 function highlightDescendant(id: string, nodes: GraphNodeSet, edges: GraphEdgeSet) {
     if (nodes.has(id)) {
         const node = nodes.get(id);
-        node.highlighted = true;
+        node.addCSSClass('highlight');
 
         // 子孫に繋がる辺をハイライトする
         node.getOutEdgeIds()
@@ -165,7 +125,7 @@ function highlightDescendant(id: string, nodes: GraphNodeSet, edges: GraphEdgeSe
             });
     } else if (edges.has(id)) {
         const edge = edges.get(id);
-        edge.highlighted = true;
+        edge.addCSSClass('highlight');
 
         highlightDescendant(edge.getTargetId(), nodes, edges);
     }

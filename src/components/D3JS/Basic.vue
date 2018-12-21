@@ -170,14 +170,16 @@
 
         private onRightButtonClicked(id: string) {
             // 経路をハイライトする
-            this.$store.commit('LayoutStore/resetElementHighlightState', {});
+            this.$store.commit('LayoutStore/clearNodeClass', {});
+            this.$store.commit('LayoutStore/clearEdgeClass', {});
             this.$store.commit('LayoutStore/highlightAncestryTree', {
                 id: id
             });
         }
 
         onClick(event: MouseEvent) {
-            this.$store.commit('LayoutStore/resetElementHighlightState', {});
+            this.$store.commit('LayoutStore/clearNodeClass', {});
+            this.$store.commit('LayoutStore/clearEdgeClass', {});
         }
 
         /**

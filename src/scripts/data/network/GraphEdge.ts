@@ -10,8 +10,7 @@ export class GraphEdge {
     private readonly sourceId: string;
     private readonly targetId: string;
     private readonly pattern: string;
-    public highlighted: boolean = false;
-    private cssClasses: string[] = [];
+    private cssClasses: string[];
 
     public constructor(id: string, color: Color,
                        sourceX: number, sourceY: number,
@@ -26,6 +25,8 @@ export class GraphEdge {
         this.sourceId = sourceId;
         this.targetId = targetId;
         this.pattern = pattern;
+
+        this.cssClasses = [this.pattern];
     }
 
     // getter
@@ -65,20 +66,27 @@ export class GraphEdge {
         return this.pattern;
     }
 
-    public getHighlighted(): boolean {
-        return this.highlighted;
-    }
-
     public getCSSClasses(): string[] {
         return this.cssClasses;
     }
 
     // setter
     public addCSSClass(cssClass: string): void {
-        this.cssClasses.push(cssClass);
+        if (!this.hasCSSClass(cssClass)) {
+            this.cssClasses.push(cssClass);
+        }
     }
 
     public clearCSSClasses(): void {
-        this.cssClasses = [];
+        this.cssClasses = [this.getPattern()];
+    }
+
+    public hasCSSClass(cssClass: string): boolean {
+        for (let i = 0; i < this.cssClasses.length; i++) {
+            if (this.cssClasses[i] === cssClass) {
+                return true;
+            }
+        }
+        return false;
     }
 }

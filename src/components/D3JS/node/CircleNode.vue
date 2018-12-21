@@ -4,7 +4,7 @@
                 cx="1"
                 cy="1"
                 :fill="color"
-                :class="{highlighted : node.highlighted}"
+                :class="node.getCSSClasses()"
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
                 @click="onClick"
@@ -49,7 +49,7 @@
         }
 
         @Emit('node-click')
-        public onContextMenu(event : MouseEvent): NodeClickEvent {
+        public onContextMenu(event: MouseEvent): NodeClickEvent {
             event.preventDefault();
             return {
                 id: this.node.getId(),
@@ -60,7 +60,7 @@
 </script>
 
 <style scoped>
-    .highlighted {
+    .highlight {
         stroke: darkgreen;
         stroke-width: 4px;
     }
