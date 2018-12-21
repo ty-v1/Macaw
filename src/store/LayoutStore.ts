@@ -74,9 +74,24 @@ const mutations = {
             return;
         }
 
+        const node: GraphNode = nodes.get(id);
+        // 選択したノードをハイライトする
+        node.addCSSClass('selected');
+
         // 再帰的に経路をハイライトする
-        highlightAncestor(id, nodes, edges);
-        highlightDescendant(id, nodes, edges);
+        // 祖先
+        node.getInEdgeIds()
+            .forEach((edgeId) => {
+                highlightAncestor(edgeId, nodes, edges);
+            });
+        // highlightAncestor(, nodes, edges);
+        // 子孫
+        node.getOutEdgeIds()
+            .forEach((edgeId) => {
+                highlightDescendant(edgeId, nodes, edges);
+            });
+
+        // highlightDescendant(id, nodes, edges);
     },
 
     clearNodeClass: (state, payload) => {

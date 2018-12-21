@@ -20,11 +20,6 @@
 </script>
 
 <style scoped>
-    .selected {
-        stroke: cornflowerblue;
-        stroke-width: 4px;
-    }
-
     .highlight {
         stroke: darkgreen;
         stroke-width: 4px;

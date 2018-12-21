@@ -1,10 +1,10 @@
 <template>
     <div class="content">
-        <div class="svg-wrapper">
+        <div class="svg-wrapper"
+             @click="onClick">
             <svg :width="SVGWidth"
                  :height="SVGHeight"
-                 class="svg"
-                 @click="onClick">
+                 class="svg">
                 <defs>
                     <filter id="double">
                         <feMorphology in="SourceGraphic" result="a" operator="dilate" radius="1"></feMorphology>
@@ -58,7 +58,7 @@
     import {Variant} from "../../scripts/data/Variant";
     import Popup from "../Popup.vue";
     import {NodeMouseOverEvent} from "../../scripts/event/NodeMouseOverEvent";
-    import {LEFT_BUTTON, NodeClickEvent, RIGHT_BUTTON} from "../../scripts/event/NodeClickEvent";
+    import {NodeClickEvent} from "../../scripts/event/NodeClickEvent";
     import DoubleLine from "./edge/DoubleLine.vue";
 
     @Component({components: {DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
@@ -135,49 +135,28 @@
         }
 
         onNodeClick(event: NodeClickEvent) {
-
-            switch (event.buttons) {
-                case LEFT_BUTTON:
-                    this.onLeftButtonClicked(event.id);
-                    break;
-                case RIGHT_BUTTON:
-                    this.onRightButtonClicked(event.id);
-                    break;
-                default:
-            }
-        }
-
-        private onLeftButtonClicked(id: string) {
             const variantId: string = this.$store.getters['DiffStore/variantId'];
 
-            if (variantId !== '' && id === variantId) {
+            // 経路のハイライトを解除する
+            this.$store.commit('LayoutStore/clearNodeClass', {});
+            this.$store.commit('LayoutStore/clearEdgeClass', {});
+
+            if (variantId !== '' && event.id === variantId) {
                 this.$store.commit('DiffStore/reset', {});
-                this.$store.commit('LayoutStore/setElementHighlightState', {
-                    id: id,
-                    highlightState: false
-                });
 
             } else {
                 this.$store.commit('DiffStore/setVariantId', {
-                    variantId: id
+                    variantId: event.id
                 });
-                this.$store.commit('LayoutStore/setElementHighlightState', {
-                    id: id,
-                    highlightState: true
+                // 経路をハイライトする
+                this.$store.commit('LayoutStore/highlightAncestryTree', {
+                    id: event.id
                 });
             }
         }
 
-        private onRightButtonClicked(id: string) {
-            // 経路をハイライトする
-            this.$store.commit('LayoutStore/clearNodeClass', {});
-            this.$store.commit('LayoutStore/clearEdgeClass', {});
-            this.$store.commit('LayoutStore/highlightAncestryTree', {
-                id: id
-            });
-        }
-
         onClick(event: MouseEvent) {
+            this.$store.commit('DiffStore/reset', {});
             this.$store.commit('LayoutStore/clearNodeClass', {});
             this.$store.commit('LayoutStore/clearEdgeClass', {});
         }
