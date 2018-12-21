@@ -1,6 +1,6 @@
 import HashMap from "hashmap";
-import {Color} from "@/scripts/color/Color";
 import {GraphEdge} from "@/scripts/data/network/GraphEdge";
+import {DefaultEdge} from "@/scripts/data/network/DefaultEdge";
 
 export class GraphEdgeSet {
 
@@ -11,7 +11,7 @@ export class GraphEdgeSet {
     }
 
     public add(edge: GraphEdge): void {
-        this.idToEdge.set(edge.id, edge);
+        this.idToEdge.set(edge.getId(), edge);
     }
 
     public filter(f: (edge: GraphEdge) => boolean): GraphEdge[] {
@@ -31,18 +31,7 @@ export class GraphEdgeSet {
         if (this.idToEdge.has(id)) {
             return this.idToEdge.get(id);
         } else {
-            return {
-                id: "null",
-                targetX: 0,
-                targetY: 0,
-                sourceX: 0,
-                sourceY: 0,
-                color: Color.BLACK,
-                sourceId: "null",
-                targetId: "null",
-                pattern: "none",
-                highlighted: false
-            };
+            return DefaultEdge.getInstance();
         }
     }
 

@@ -1,6 +1,7 @@
 import {INodePositionStrategy} from "@/scripts/network/node/strategy/position/INodePositionStrategy";
 import {Variant} from "@/scripts/data/Variant";
-import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
+import HashMap from "hashmap";
+import {NodeDatum} from "@/scripts/data/network/GraphNode";
 
 export class NoAlignHierarchy implements INodePositionStrategy {
 
@@ -8,7 +9,7 @@ export class NoAlignHierarchy implements INodePositionStrategy {
          maxGenerationNumber: number,
          xPadding: number,
          yPadding: number,
-         nodes: GraphNodeSet): void {
+         nodeData: HashMap<string, NodeDatum>): void {
         // 設定したX座標を記憶する
         const generationNumberToCurrentX = new Array(maxGenerationNumber + 1);
         generationNumberToCurrentX.fill(0);
@@ -18,7 +19,7 @@ export class NoAlignHierarchy implements INodePositionStrategy {
             const beforeX = generationNumberToCurrentX[generationNumber];
             const x = (beforeX === 0) ? 0 : beforeX + xPadding;
 
-            const node = nodes.get(variant.getId());
+            const node = nodeData.get(variant.getId());
             node.x = x;
             node.y = generationNumber * yPadding + generationNumber * node.height;
 

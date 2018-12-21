@@ -1,7 +1,8 @@
 import {Color} from "@/scripts/color/Color";
 import {INodeColorStrategy} from "@/scripts/network/node/strategy/color/INodeColorStrategy";
 import {Variant} from "@/scripts/data/Variant";
-import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
+import HashMap from "hashmap";
+import {NodeDatum} from "@/scripts/data/network/GraphNode";
 
 export class ThreeBasePointsGradation implements INodeColorStrategy {
 
@@ -16,13 +17,13 @@ export class ThreeBasePointsGradation implements INodeColorStrategy {
 
     exec(variants: Variant[],
          maxGenerationNumber: number,
-         nodes: GraphNodeSet): void {
+         nodeData: HashMap<string, NodeDatum>): void {
         // midPointの計算
         const midPoint = this.midPointCreator(variants);
 
         // 色を変更
         variants.forEach((variant) => {
-            const node = nodes.get(variant.getId());
+            const node = nodeData.get(variant.getId());
             node.color = this.createNodeColor(variant, midPoint);
         });
     }

@@ -1,5 +1,6 @@
 import {Variant} from "@/scripts/data/Variant";
-import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
+import HashMap from "hashmap";
+import {NodeDatum} from "@/scripts/data/network/GraphNode";
 
 export interface INodePositionStrategy {
 
@@ -7,6 +8,6 @@ export interface INodePositionStrategy {
          maxGenerationNumber: number,
          xPadding: number,
          yPadding: number,
-         nodes: GraphNodeSet): void;
+         nodeData: HashMap<string, NodeDatum>): void;
 
 }

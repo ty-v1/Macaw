@@ -1,6 +1,6 @@
 import HashMap from "hashmap";
 import {GraphNode} from "@/scripts/data/network/GraphNode";
-import {Color} from "@/scripts/color/Color";
+import {DefaultNode} from "@/scripts/data/network/DefaultNode";
 
 export class GraphNodeSet {
 
@@ -11,25 +11,14 @@ export class GraphNodeSet {
     }
 
     public add(node: GraphNode): void {
-        this.idToNode.set(node.id, node);
+        this.idToNode.set(node.getId(), node);
     }
 
     public get(id: string): GraphNode {
         if (this.idToNode.has(id)) {
             return this.idToNode.get(id);
         } else {
-            return {
-                id: "null",
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
-                color: Color.BLACK,
-                shape: "none",
-                highlighted: false,
-                inEdgeIds: [],
-                outEdgeIds: []
-            };
+            return DefaultNode.getInstance();
         }
     }
 
@@ -59,7 +48,7 @@ export class GraphNodeSet {
 
         this.idToNode.values()
             .forEach((node) => {
-                const x = node.x + node.width;
+                const x = node.getX() + node.getWidth();
                 if (max < x) {
                     max = x;
                 }
@@ -72,7 +61,7 @@ export class GraphNodeSet {
 
         this.idToNode.values()
             .forEach((node) => {
-                const y = node.y + node.height;
+                const y = node.getY() + node.getHeight();
                 if (max < y) {
                     max = y;
                 }

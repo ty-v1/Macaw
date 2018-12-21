@@ -79,25 +79,25 @@
          *  computed
          *  */
         get circleNode(): GraphNode[] {
-            const filter = (node: GraphNode) => node.shape === 'circle';
+            const filter = (node: GraphNode) => node.getShape() === 'circle';
 
             return this.$store.getters['LayoutStore/filteredNodes'](filter);
         }
 
         get crossNode(): GraphNode[] {
-            const filter = (node: GraphNode) => node.shape === 'cross';
+            const filter = (node: GraphNode) => node.getShape() === 'cross';
 
             return this.$store.getters['LayoutStore/filteredNodes'](filter);
         }
 
         get simpleLine(): GraphEdge[] {
-            const filter = (edge: GraphEdge) => edge.pattern !== 'double-line';
+            const filter = (edge: GraphEdge) => edge.getPattern() !== 'double-line';
 
             return this.$store.getters['LayoutStore/filteredEdges'](filter);
         }
 
         get doubleLine(): GraphEdge[] {
-            const filter = (edge: GraphEdge) => edge.pattern === 'double-line';
+            const filter = (edge: GraphEdge) => edge.getPattern() === 'double-line';
 
             return this.$store.getters['LayoutStore/filteredEdges'](filter);
         }
@@ -150,7 +150,7 @@
         private onLeftButtonClicked(id: string) {
             const variantId: string = this.$store.getters['DiffStore/variantId'];
 
-            if (variantId !== '') {
+            if (variantId !== '' && id === variantId) {
                 this.$store.commit('DiffStore/reset', {});
                 this.$store.commit('LayoutStore/setElementHighlightState', {
                     id: id,
@@ -170,14 +170,16 @@
 
         private onRightButtonClicked(id: string) {
             // 経路をハイライトする
-            this.$store.commit('LayoutStore/resetElementHighlightState', {});
+            this.$store.commit('LayoutStore/clearNodeClass', {});
+            this.$store.commit('LayoutStore/clearEdgeClass', {});
             this.$store.commit('LayoutStore/highlightAncestryTree', {
                 id: id
             });
         }
 
         onClick(event: MouseEvent) {
-            this.$store.commit('LayoutStore/resetElementHighlightState', {});
+            this.$store.commit('LayoutStore/clearNodeClass', {});
+            this.$store.commit('LayoutStore/clearEdgeClass', {});
         }
 
         /**

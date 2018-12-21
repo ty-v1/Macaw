@@ -12,18 +12,18 @@ export default class EdgeComponentBase extends Vue {
      * computed methods
      * */
     get sourceX(): number {
-        return this.edge.sourceX;
+        return this.edge.getSourceX();
     }
 
     get sourceY(): number {
-        return this.edge.sourceY;
+        return this.edge.getSourceY();
     }
 
     get targetX(): number {
-        return this.edge.targetX;
+        return this.edge.getTargetX();
     }
 
     get targetY(): number {
-        return this.edge.targetY;
+        return this.edge.getTargetY();
     }
 }

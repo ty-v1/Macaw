@@ -5,7 +5,7 @@
               :x2="targetX"
               :y2="targetY"
               fill="none"
-              :class="[edge.pattern, {highlighted : edge.highlighted}]">
+              :class="edge.getCSSClasses()">
         </line>
     </g>
 </template>
@@ -20,7 +20,12 @@
 </script>
 
 <style scoped>
-    .highlighted {
+    .selected {
+        stroke: cornflowerblue;
+        stroke-width: 4px;
+    }
+
+    .highlight {
         stroke: darkgreen;
         stroke-width: 4px;
     }

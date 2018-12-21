@@ -4,7 +4,7 @@
                 cx="1"
                 cy="1"
                 :fill="color"
-                :class="{highlighted : node.highlighted}"
+                :class="node.getCSSClasses()"
                 @mouseover="onMouseOver"
                 @mouseout="onMouseOut"
                 @click="onClick"
@@ -25,11 +25,11 @@
         @Emit('node-mouse-over')
         public onMouseOver(event: MouseEvent): NodeMouseOverEvent {
             return {
-                id: this.node.id,
-                nodeX: this.node.x,
-                nodeY: this.node.y,
-                nodeWidth: this.node.width,
-                nodeHeight: this.node.height,
+                id: this.node.getId(),
+                nodeX: this.node.getX(),
+                nodeY: this.node.getY(),
+                nodeWidth: this.node.getWidth(),
+                nodeHeight: this.node.getHeight(),
                 pageX: event.offsetX,
                 pageY: event.offsetY
             };
@@ -43,16 +43,16 @@
         public onClick(event: MouseEvent): NodeClickEvent {
             event.stopPropagation();
             return {
-                id: this.node.id,
+                id: this.node.getId(),
                 buttons: event.buttons
             };
         }
 
         @Emit('node-click')
-        public onContextMenu(event : MouseEvent): NodeClickEvent {
+        public onContextMenu(event: MouseEvent): NodeClickEvent {
             event.preventDefault();
             return {
-                id: this.node.id,
+                id: this.node.getId(),
                 buttons: 2
             };
         }
@@ -60,7 +60,7 @@
 </script>
 
 <style scoped>
-    .highlighted {
+    .highlight {
         stroke: darkgreen;
         stroke-width: 4px;
     }
