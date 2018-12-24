@@ -22,7 +22,8 @@ const state: VariantStoreState = {
 };
 
 const getters = {
-    variants: state => state.idToVariant.values().sort(Variant.compare),
+    variants: state => state.idToVariant.values()
+                            .sort(Variant.compare),
 
     variant: state => (id: string) => state.idToVariant.get(id),
 
@@ -50,8 +51,8 @@ const getters = {
         const generationNumberToStatistics: Statistics[] = new Array(state.maxGenerationNumber + 1);
         for (let i = 0; i <= state.maxGenerationNumber; i++) {
             generationNumberToStatistics[i] = {
-                max: 0,
-                min: 0,
+                max: undefined,
+                min: undefined,
                 sum: 0,
                 count: 0
             };
@@ -69,14 +70,18 @@ const getters = {
 
                  const statistics = generationNumberToStatistics[generationNumber];
 
-
                  // 最大値を更新する
-                 if (statistics.max < fitness) {
+                 if (statistics.max === undefined) {
+                     statistics.max = fitness;
+                 } else if (statistics.max < fitness) {
                      statistics.max = fitness;
                  }
 
                  // 最小値を更新する
-                 if (statistics.min > fitness) {
+                 if (statistics.min === undefined) {
+                     statistics.min = fitness;
+                 }
+                 else if (statistics.min > fitness) {
                      statistics.min = fitness;
                  }
 
