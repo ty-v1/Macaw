@@ -24,4 +24,8 @@ export class CompressedVariant extends Variant {
             .addItem('count', this.count.toString())
             .buildMessage();
     }
+
+    public getCount(): number {
+        return this.count;
+    }
 }
