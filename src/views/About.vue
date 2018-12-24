@@ -54,7 +54,19 @@
                         animation: false,
                         maintainAspectRatio: false,
                         scales: {
+                            xAxes: [{
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Generation Number',
+                                    fontSize: 18
+                                },
+                            }],
                             yAxes: [{
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Fitness',
+                                    fontSize: 18
+                                },
                                 ticks: {
                                     min: 0.0,
                                     max: 1.0,
