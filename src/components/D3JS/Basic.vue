@@ -1,16 +1,17 @@
 <template>
-    <div class="content">
-        <div class="svg-wrapper"
-             @click="onClick">
-            <svg :width="SVGWidth"
-                 :height="SVGHeight"
-                 class="svg">
-                <defs>
-                    <filter id="double">
-                        <feMorphology in="SourceGraphic" result="a" operator="dilate" radius="1"></feMorphology>
-                        <feComposite in="SourceGraphic" in2="a" result="xx" operator="xor"></feComposite>
-                    </filter>
-                </defs>
+    <div class="wrapper">
+        <div class="button">
+            <button @click="reset">RESET</button>
+        </div>
+        <div class="content" ref="content">
+            <svg :width="width"
+                 :height="height"
+                 :viewBox="viewBox"
+                 @click="onClick"
+                 @wheel="onWheel"
+                 @mousedown="startDrag"
+                 @mouseup="stopDrag"
+                 @mousemove="onDrag">
                 <g transform="translate(20, 20)">
                     <SimpleLine v-for="edge in simpleLine"
                                 :key="edge.id"
@@ -63,14 +64,13 @@
 
     @Component({components: {DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
+
         /**
          * data
          * */
-        private static readonly BASE_COLOR_CODES = [
-            Color.RED,
-            Color.WHITE,
-            Color.GREEN
-        ];
+        private isDragging: boolean = false;
+        private onDragEvent: boolean = false;
+        private dragStart: { x: number, y: number } = {x: 0, y: 0}
 
         private unwatch: () => void = () => {
         };
@@ -102,12 +102,34 @@
             return this.$store.getters['LayoutStore/filteredEdges'](filter);
         }
 
-        get SVGWidth() {
-            return this.$store.getters['LayoutStore/svgWidth'] + 40;
+        get width() {
+            const content = this.$refs.content;
+
+            if (content instanceof Element) {
+                const svgWidth = this.$store.getters['LayoutStore/svgWidth'] + 40;
+                const contentWidth = content.getBoundingClientRect().width;
+
+                return Math.max(svgWidth, contentWidth);
+            } else {
+                return this.$store.getters['LayoutStore/svgWidth'] + 40;
+            }
         }
 
-        get SVGHeight() {
-            return this.$store.getters['LayoutStore/svgHeight'] + 40;
+        get height() {
+            const content = this.$refs.content;
+
+            if (content instanceof Element) {
+                const svgHeight = this.$store.getters['LayoutStore/svgHeight'] + 40;
+                const contentHeight = content.getBoundingClientRect().height;
+
+                return Math.max(svgHeight, contentHeight);
+            } else {
+                return this.$store.getters['LayoutStore/svgWidth'] + 40;
+            }
+        }
+
+        get viewBox(): string {
+            return this.$store.getters['LayoutStore/viewBox'];
         }
 
         /**
@@ -161,6 +183,79 @@
             this.$store.commit('LayoutStore/clearEdgeClass', {});
         }
 
+        onWheel(e: WheelEvent) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const scale = Math.pow(1.01, (e.deltaY < 0) ? 1 : -1);
+
+            this.$store.commit('LayoutStore/zoom', {
+                cursor: {
+                    x: e.offsetX,
+                    y: e.offsetY,
+                },
+                scale: scale
+            });
+        }
+
+        startDrag(e: MouseEvent) {
+            this.isDragging = true;
+            this.dragStart.x = e.offsetX;
+            this.dragStart.y = e.offsetY;
+        }
+
+        stopDrag() {
+            this.isDragging = false;
+        }
+
+        async onDrag(e: MouseEvent) {
+            if (!this.isDragging || this.onDragEvent) {
+                return;
+            }
+
+            // 感度が高すぎるためイベントを間引く
+            this.onDragEvent = true;
+            setTimeout(async () => {
+                this.$store.commit('LayoutStore/pan', {
+                    offset: {
+                        x: e.offsetX - this.dragStart.x,
+                        y: e.offsetY - this.dragStart.y
+                    }
+                });
+
+                this.onDragEvent = false;
+            }, 150);
+        }
+
+        reset() {
+            this.$store.commit('LayoutStore/reset', {
+                content: {
+                    width: this.contentWidth,
+                    height: this.contentHeight
+                }
+            });
+        }
+
+        private get contentWidth(): number {
+            const content = this.$refs.content;
+
+            if (content instanceof Element) {
+                return content.getBoundingClientRect().width;
+            } else {
+                return 100;
+            }
+        }
+
+        private get contentHeight(): number {
+            const content = this.$refs.content;
+
+            if (content instanceof Element) {
+                return content.getBoundingClientRect().height;
+            } else {
+                return 100;
+            }
+        }
+
         /**
          * life cycle
          * */
@@ -180,7 +275,11 @@
 
             this.$store.commit('LayoutStore/setNodeColorStrategy', {
                 nodeColorStrategy: new ThreeBasePointsGradation(
-                    Basic.BASE_COLOR_CODES, midCalculator)
+                    [
+                        Color.RED,
+                        Color.WHITE,
+                        Color.GREEN
+                    ], midCalculator)
             });
 
             this.$store.commit('LayoutStore/setNodePositionStrategy',
@@ -191,7 +290,9 @@
 
             this.$store.commit('LayoutStore/setNodeShapeStrategy',
                                {nodeShapeStrategy: new FitnessBasedNodeShape()});
+        }
 
+        mounted() {
             this.apply();
         }
 
@@ -209,29 +310,31 @@
             this.$store.commit('LayoutStore/apply', {
                 variants: variants,
                 maxGenerationNumber: maxGenerationNumber,
-                generationNumberToVariantCount: generationNumberToVariantCount
+                generationNumberToVariantCount: generationNumberToVariantCount,
+                content: {
+                    width: this.contentWidth,
+                    height: this.contentHeight
+                }
             });
         }
     }
 </script>
 
 <style scoped>
+    .wrapper {
+        width: 100%;
+        height: 100%;
+    }
+
     svg {
         position: relative;
-        z-index: 0
+        z-index: 0;
     }
 
     .content {
+        width: 100%;
+        height: 100%;
         overflow: hidden;
-        width: 100%;
-        height: 100%;
-    }
-
-    .svg-wrapper {
-        position: relative;
-        overflow: scroll;
-        width: 100%;
-        height: 100%;
     }
 </style>
 <style>
