@@ -1,45 +1,38 @@
 <template>
-    <div class="content">
-        <div class="svg-wrapper"
-             @click="onClick">
-            <svg :width="SVGWidth"
-                 :height="SVGHeight"
-                 class="svg">
-                <defs>
-                    <filter id="double">
-                        <feMorphology in="SourceGraphic" result="a" operator="dilate" radius="1"></feMorphology>
-                        <feComposite in="SourceGraphic" in2="a" result="xx" operator="xor"></feComposite>
-                    </filter>
-                </defs>
-                <g transform="translate(20, 20)">
-                    <SimpleLine v-for="edge in simpleLine"
-                                :key="edge.id"
-                                :edge="edge">
-                    </SimpleLine>
+    <div class="content" ref="content">
+        <svg :width="width"
+             :height="height"
+             :viewBox="viewBox"
+             @click="onClick"
+             @wheel="onWheel">
+            <g transform="translate(20, 20)">
+                <SimpleLine v-for="edge in simpleLine"
+                            :key="edge.id"
+                            :edge="edge">
+                </SimpleLine>
 
-                    <DoubleLine v-for="edge in doubleLine"
-                                :key="edge.id"
-                                :edge="edge">
-                    </DoubleLine>
+                <DoubleLine v-for="edge in doubleLine"
+                            :key="edge.id"
+                            :edge="edge">
+                </DoubleLine>
 
-                    <CircleNode v-for="node in circleNode"
-                                :key="node.id"
-                                :node="node"
-                                @node-mouse-over="onNodeMouseOver"
-                                @node-mouse-out="onNodeMouseOut"
-                                @node-click="onNodeClick">
-                    </CircleNode>
+                <CircleNode v-for="node in circleNode"
+                            :key="node.id"
+                            :node="node"
+                            @node-mouse-over="onNodeMouseOver"
+                            @node-mouse-out="onNodeMouseOut"
+                            @node-click="onNodeClick">
+                </CircleNode>
 
-                    <CrossNode v-for="node in crossNode"
-                               :key="node.id"
-                               :node="node"
-                               @node-mouse-over="onNodeMouseOver"
-                               @node-mouse-out="onNodeMouseOut">
-                    </CrossNode>
-                </g>
-            </svg>
-            <Popup></Popup>
-        </div>
+                <CrossNode v-for="node in crossNode"
+                           :key="node.id"
+                           :node="node"
+                           @node-mouse-over="onNodeMouseOver"
+                           @node-mouse-out="onNodeMouseOut">
+                </CrossNode>
+            </g>
+        </svg>
+        <Popup></Popup>
     </div>
 </template>
 
@@ -63,14 +56,6 @@
 
     @Component({components: {DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
-        /**
-         * data
-         * */
-        private static readonly BASE_COLOR_CODES = [
-            Color.RED,
-            Color.WHITE,
-            Color.GREEN
-        ];
 
         private unwatch: () => void = () => {
         };
@@ -102,12 +87,34 @@
             return this.$store.getters['LayoutStore/filteredEdges'](filter);
         }
 
-        get SVGWidth() {
-            return this.$store.getters['LayoutStore/svgWidth'] + 40;
+        get width() {
+            const content = this.$refs.content;
+
+            if (content instanceof Element) {
+                const svgWidth = this.$store.getters['LayoutStore/svgWidth'] + 40;
+                const contentWidth = content.getBoundingClientRect().width;
+
+                return Math.max(svgWidth, contentWidth);
+            } else {
+                return this.$store.getters['LayoutStore/svgWidth'] + 40;
+            }
         }
 
-        get SVGHeight() {
-            return this.$store.getters['LayoutStore/svgHeight'] + 40;
+        get height() {
+            const content = this.$refs.content;
+
+            if (content instanceof Element) {
+                const svgHeight = this.$store.getters['LayoutStore/svgHeight'] + 40;
+                const contentHeight = content.getBoundingClientRect().height;
+
+                return Math.max(svgHeight, contentHeight);
+            } else {
+                return this.$store.getters['LayoutStore/svgWidth'] + 40;
+            }
+        }
+
+        get viewBox(): string {
+            return this.$store.getters['LayoutStore/viewBox'];
         }
 
         /**
@@ -161,6 +168,41 @@
             this.$store.commit('LayoutStore/clearEdgeClass', {});
         }
 
+        onWheel(e: WheelEvent) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const scale = Math.pow(1.01, (e.deltaY < 0) ? 1 : -1);
+
+            this.$store.commit('LayoutStore/zoom', {
+                cursor: {
+                    x: e.offsetX,
+                    y: e.offsetY,
+                },
+                scale: scale
+            });
+        }
+
+        private get contentWidth(): number {
+            const content = this.$refs.content;
+
+            if (content instanceof Element) {
+                return content.getBoundingClientRect().width;
+            } else {
+                return 100;
+            }
+        }
+
+        private get contentHeight(): number {
+            const content = this.$refs.content;
+
+            if (content instanceof Element) {
+                return content.getBoundingClientRect().height;
+            } else {
+                return 100;
+            }
+        }
+
         /**
          * life cycle
          * */
@@ -180,7 +222,11 @@
 
             this.$store.commit('LayoutStore/setNodeColorStrategy', {
                 nodeColorStrategy: new ThreeBasePointsGradation(
-                    Basic.BASE_COLOR_CODES, midCalculator)
+                    [
+                        Color.RED,
+                        Color.WHITE,
+                        Color.GREEN
+                    ], midCalculator)
             });
 
             this.$store.commit('LayoutStore/setNodePositionStrategy',
@@ -191,7 +237,9 @@
 
             this.$store.commit('LayoutStore/setNodeShapeStrategy',
                                {nodeShapeStrategy: new FitnessBasedNodeShape()});
+        }
 
+        mounted() {
             this.apply();
         }
 
@@ -209,7 +257,11 @@
             this.$store.commit('LayoutStore/apply', {
                 variants: variants,
                 maxGenerationNumber: maxGenerationNumber,
-                generationNumberToVariantCount: generationNumberToVariantCount
+                generationNumberToVariantCount: generationNumberToVariantCount,
+                content: {
+                    width: this.contentWidth,
+                    height: this.contentHeight
+                }
             });
         }
     }
@@ -218,20 +270,13 @@
 <style scoped>
     svg {
         position: relative;
-        z-index: 0
+        z-index: 0;
     }
 
     .content {
+        width: 100%;
+        height: 100%;
         overflow: hidden;
-        width: 100%;
-        height: 100%;
-    }
-
-    .svg-wrapper {
-        position: relative;
-        overflow: scroll;
-        width: 100%;
-        height: 100%;
     }
 </style>
 <style>

@@ -8,10 +8,25 @@ import {DefaultNodeShape} from "@/scripts/network/node/strategy/shape/DefaultNod
 import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 import {GraphEdgeSet} from "@/scripts/data/network/GraphEdgeSet";
 import {GraphEdge} from "@/scripts/data/network/GraphEdge";
+import {sprintf} from "sprintf-js";
+
+type ViewBox = {
+    minX: number,
+    minY: number,
+    width: number,
+    height: number
+}
+
+type Size = {
+    width: number,
+    height: number
+}
 
 export interface LayoutStoreState {
     layoutStrategy: LayoutFactory,
-    layout: Layout | null
+    layout: Layout | null,
+    viewBox: ViewBox,
+    size: Size
 }
 
 const state: LayoutStoreState = {
@@ -22,6 +37,16 @@ const state: LayoutStoreState = {
         new DefaultNodeShape()
     ),
     layout: null,
+    viewBox: {
+        minX: 0,
+        minY: 0,
+        width: 100,
+        height: 100
+    },
+    size: {
+        width: 100,
+        height: 100
+    }
 };
 
 const getters = {
@@ -39,7 +64,13 @@ const getters = {
 
     svgHeight: state => (state.layout !== null) ? state.layout.height : 0,
 
-    svgWidth: state => (state.layout !== null) ? state.layout.width : 0
+    svgWidth: state => (state.layout !== null) ? state.layout.width : 0,
+
+    viewBox: state => sprintf('%.4f, %.4f, %.4f, %.4f',
+                              state.viewBox.minX,
+                              state.viewBox.minY,
+                              state.viewBox.width,
+                              state.viewBox.height)
 };
 
 const mutations = {
@@ -62,7 +93,54 @@ const mutations = {
                                   payload.generationNumberToVariantCount,
                                   30,
                                   20);
+
+        // 初期状態は全体が収まるように設定
+        const svgWidth: number = state.layout.width + 40;
+        const svgHeight: number = state.layout.height + 40;
+
+        const contentWidth = payload.content.width;
+        const contentHeight = payload.content.height;
+
+        // 縦横のいずれかが小さいときはcontentに収まるようにviewBoxの値を変える
+        let ratio: number = 1;
+        if (contentWidth < svgWidth || contentHeight < svgHeight) {
+            const widthRatio = svgWidth / contentWidth;
+            const heightRation = svgHeight / contentHeight;
+            ratio = Math.max(widthRatio, heightRation);
+        }
+
+        state.viewBox = {
+            minX: 0,
+            minY: 0,
+            width: svgWidth * ratio,
+            height: svgHeight * ratio
+        };
     },
+    zoom: (state,
+           payload: {
+               cursor: { x: number, y: number },
+               scale: number,
+           }) => {
+        // 正規化する
+        const svgWidth: number = state.layout.width + 40;
+        const svgHeight: number = state.layout.height + 40;
+        const xRatio: number = payload.cursor.x / svgWidth;
+        const yRatio: number = payload.cursor.y / svgHeight;
+
+        // 正規化した座標を元にviewBox上におけるカーソルの位置を求める
+        const scale = payload.scale;
+        const x = state.viewBox.minX + state.viewBox.width * xRatio;
+        const y = state.viewBox.minY + state.viewBox.height * yRatio;
+
+        state.viewBox = {
+            minX: x + scale * (state.viewBox.minX - x),
+            minY: y + scale * (state.viewBox.minY - y),
+            width: state.viewBox.width * scale,
+            height: state.viewBox.height * scale
+        };
+    },
+
+    // pan:(state)
 
     highlightAncestryTree: (state, payload) => {
         const id: string = payload.id;
