@@ -1,38 +1,46 @@
 <template>
-    <div class="content" ref="content">
-        <svg :width="width"
-             :height="height"
-             :viewBox="viewBox"
-             @click="onClick"
-             @wheel="onWheel">
-            <g transform="translate(20, 20)">
-                <SimpleLine v-for="edge in simpleLine"
-                            :key="edge.id"
-                            :edge="edge">
-                </SimpleLine>
+    <div class="wrapper">
+        <div class="button">
+            <button @click="reset">RESET</button>
+        </div>
+        <div class="content" ref="content">
+            <svg :width="width"
+                 :height="height"
+                 :viewBox="viewBox"
+                 @click="onClick"
+                 @wheel="onWheel"
+                 @mousedown="startDrag"
+                 @mouseup="stopDrag"
+                 @mousemove="onDrag">
+                <g transform="translate(20, 20)">
+                    <SimpleLine v-for="edge in simpleLine"
+                                :key="edge.id"
+                                :edge="edge">
+                    </SimpleLine>
 
-                <DoubleLine v-for="edge in doubleLine"
-                            :key="edge.id"
-                            :edge="edge">
-                </DoubleLine>
+                    <DoubleLine v-for="edge in doubleLine"
+                                :key="edge.id"
+                                :edge="edge">
+                    </DoubleLine>
 
-                <CircleNode v-for="node in circleNode"
-                            :key="node.id"
-                            :node="node"
-                            @node-mouse-over="onNodeMouseOver"
-                            @node-mouse-out="onNodeMouseOut"
-                            @node-click="onNodeClick">
-                </CircleNode>
+                    <CircleNode v-for="node in circleNode"
+                                :key="node.id"
+                                :node="node"
+                                @node-mouse-over="onNodeMouseOver"
+                                @node-mouse-out="onNodeMouseOut"
+                                @node-click="onNodeClick">
+                    </CircleNode>
 
-                <CrossNode v-for="node in crossNode"
-                           :key="node.id"
-                           :node="node"
-                           @node-mouse-over="onNodeMouseOver"
-                           @node-mouse-out="onNodeMouseOut">
-                </CrossNode>
-            </g>
-        </svg>
-        <Popup></Popup>
+                    <CrossNode v-for="node in crossNode"
+                               :key="node.id"
+                               :node="node"
+                               @node-mouse-over="onNodeMouseOver"
+                               @node-mouse-out="onNodeMouseOut">
+                    </CrossNode>
+                </g>
+            </svg>
+            <Popup></Popup>
+        </div>
     </div>
 </template>
 
@@ -56,6 +64,13 @@
 
     @Component({components: {DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
+
+        /**
+         * data
+         * */
+        private isDragging: boolean = false;
+        private onDragEvent: boolean = false;
+        private dragStart: { x: number, y: number } = {x: 0, y: 0}
 
         private unwatch: () => void = () => {
         };
@@ -183,6 +198,44 @@
             });
         }
 
+        startDrag(e: MouseEvent) {
+            this.isDragging = true;
+            this.dragStart.x = e.offsetX;
+            this.dragStart.y = e.offsetY;
+        }
+
+        stopDrag() {
+            this.isDragging = false;
+        }
+
+        async onDrag(e: MouseEvent) {
+            if (!this.isDragging || this.onDragEvent) {
+                return;
+            }
+
+            // 感度が高すぎるためイベントを間引く
+            this.onDragEvent = true;
+            setTimeout(async () => {
+                this.$store.commit('LayoutStore/pan', {
+                    offset: {
+                        x: e.offsetX - this.dragStart.x,
+                        y: e.offsetY - this.dragStart.y
+                    }
+                });
+
+                this.onDragEvent = false;
+            }, 150);
+        }
+
+        reset() {
+            this.$store.commit('LayoutStore/reset', {
+                content: {
+                    width: this.contentWidth,
+                    height: this.contentHeight
+                }
+            });
+        }
+
         private get contentWidth(): number {
             const content = this.$refs.content;
 
@@ -268,6 +321,11 @@
 </script>
 
 <style scoped>
+    .wrapper {
+        width: 100%;
+        height: 100%;
+    }
+
     svg {
         position: relative;
         z-index: 0;

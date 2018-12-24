@@ -116,6 +116,37 @@ const mutations = {
             height: svgHeight * ratio
         };
     },
+
+    reset: (state,
+            payload: {
+                content: {
+                    width: number,
+                    height: number
+                }
+            }) => {
+        // 初期状態は全体が収まるように設定
+        const svgWidth: number = state.layout.width + 40;
+        const svgHeight: number = state.layout.height + 40;
+
+        const contentWidth = payload.content.width;
+        const contentHeight = payload.content.height;
+
+        // 縦横のいずれかが小さいときはcontentに収まるようにviewBoxの値を変える
+        let ratio: number = 1;
+        if (contentWidth < svgWidth || contentHeight < svgHeight) {
+            const widthRatio = svgWidth / contentWidth;
+            const heightRation = svgHeight / contentHeight;
+            ratio = Math.max(widthRatio, heightRation);
+        }
+
+        state.viewBox = {
+            minX: 0,
+            minY: 0,
+            width: svgWidth * ratio,
+            height: svgHeight * ratio
+        };
+    },
+
     zoom: (state,
            payload: {
                cursor: { x: number, y: number },
@@ -140,7 +171,17 @@ const mutations = {
         };
     },
 
-    // pan:(state)
+    pan: (state,
+          payload: {
+              offset: { x: number, y: number }
+          }) => {
+        state.viewBox = {
+            minX: state.viewBox.minX - payload.offset.x,
+            minY: state.viewBox.minY - payload.offset.y,
+            width: state.viewBox.width,
+            height: state.viewBox.height
+        }
+    },
 
     highlightAncestryTree: (state, payload) => {
         const id: string = payload.id;
