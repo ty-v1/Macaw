@@ -1,6 +1,6 @@
 export type Statistics = {
-    max: number,
-    min: number,
+    max: number | undefined,
+    min: number | undefined,
     sum: number,
     count: number
 }
