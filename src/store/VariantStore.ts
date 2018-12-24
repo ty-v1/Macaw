@@ -250,7 +250,7 @@ function compressVariantData(idToVariant: HashMap<string, Variant>, maxGeneratio
         if (count === 0) {
             continue;
         }
-        const id: string = sprintf('c%d', i);
+        const id: string = sprintf('c-%d', i);
 
         const compressedVariant = new CompressedVariant(id, i, -1.0, count);
 

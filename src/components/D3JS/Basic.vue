@@ -354,4 +354,11 @@
         stroke: #000000;
         stroke-width: 1;
     }
+
+    text{
+        stroke: none;
+        fill: #000000;
+        font-size: 1px;
+
+    }
 </style>
