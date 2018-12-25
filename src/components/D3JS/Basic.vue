@@ -141,7 +141,7 @@
          * */
         onNodeMouseOver(event: NodeMouseOverEvent) {
             const variant: Variant = this.$store.getters['VariantStore/variant'](event.id);
-        
+
             this.$store.commit('VariantPopupStore/initializeData',
                                {
                                    variant: variant,
@@ -200,8 +200,8 @@
 
         startDrag(e: MouseEvent) {
             this.isDragging = true;
-            this.dragStart.x = e.offsetX;
-            this.dragStart.y = e.offsetY;
+            this.dragStart.x = e.pageX;
+            this.dragStart.y = e.pageY;
         }
 
         stopDrag() {
@@ -218,8 +218,8 @@
             setTimeout(async () => {
                 this.$store.commit('LayoutStore/pan', {
                     offset: {
-                        x: e.offsetX - this.dragStart.x,
-                        y: e.offsetY - this.dragStart.y
+                        x: e.pageX - this.dragStart.x,
+                        y: e.pageY - this.dragStart.y
                     }
                 });
 
