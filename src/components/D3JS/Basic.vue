@@ -141,15 +141,12 @@
          * */
         onNodeMouseOver(event: NodeMouseOverEvent) {
             const variant: Variant = this.$store.getters['VariantStore/variant'](event.id);
-
-            const x: number = event.nodeX + event.nodeWidth * 2 + 30;
-            const y: number = event.nodeY;
-
+        
             this.$store.commit('VariantPopupStore/initializeData',
                                {
                                    variant: variant,
-                                   x: x,
-                                   y: y,
+                                   x: event.pageX,
+                                   y: event.pageY - 20,
                                    width: 100,
                                    height: 100,
                                });
