@@ -8,9 +8,8 @@ import {DefaultNodeShape} from "@/scripts/network/node/strategy/shape/DefaultNod
 import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
 import {GraphEdgeSet} from "@/scripts/data/network/GraphEdgeSet";
 import {GraphEdge} from "@/scripts/data/network/GraphEdge";
-import {sprintf} from "sprintf-js";
 
-type ViewBox = {
+export type ViewBox = {
     minX: number,
     minY: number,
     width: number,
@@ -66,11 +65,7 @@ const getters = {
 
     svgWidth: state => (state.layout !== null) ? state.layout.width : 0,
 
-    viewBox: state => sprintf('%.4f, %.4f, %.4f, %.4f',
-                              state.viewBox.minX,
-                              state.viewBox.minY,
-                              state.viewBox.width,
-                              state.viewBox.height)
+    viewBox: state => state.viewBox
 };
 
 const mutations = {

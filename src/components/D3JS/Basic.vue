@@ -61,6 +61,8 @@
     import {NodeMouseOverEvent} from "../../scripts/event/NodeMouseOverEvent";
     import {NodeClickEvent} from "../../scripts/event/NodeClickEvent";
     import DoubleLine from "./edge/DoubleLine.vue";
+    import {ViewBox} from "../../store/LayoutStore";
+    import {sprintf} from "sprintf-js";
 
     @Component({components: {DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
@@ -129,14 +131,15 @@
         }
 
         get viewBox(): string {
-            return this.$store.getters['LayoutStore/viewBox'];
+            const viewBox: ViewBox = this.$store.getters['LayoutStore/viewBox'];
+            return sprintf('%.3f, %.3f, %.3f, %.3f',
+                           viewBox.minX, viewBox.minY, viewBox.width, viewBox.height);
         }
 
         /**
          * custom event handler
          * */
         onNodeMouseOver(event: NodeMouseOverEvent) {
-
             const variant: Variant = this.$store.getters['VariantStore/variant'](event.id);
 
             const x: number = event.nodeX + event.nodeWidth * 2 + 30;
@@ -355,7 +358,7 @@
         stroke-width: 1;
     }
 
-    text{
+    text {
         stroke: none;
         fill: #000000;
         font-size: 1px;
