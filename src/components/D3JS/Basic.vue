@@ -224,7 +224,7 @@
                 });
 
                 this.onDragEvent = false;
-            }, 150);
+            }, 90);
         }
 
         reset() {
