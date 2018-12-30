@@ -12,7 +12,7 @@ export class CompressedVariant extends Variant {
             executedTestsCount: 0,
             testResults: []
         };
-        super(id, generationNumber, fitness, false, 0, [], [], testSummary, false);
+        super(id, generationNumber, fitness, false, 0, [], [], testSummary, new Set());
 
         this.count = count;
     }
