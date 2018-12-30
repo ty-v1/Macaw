@@ -149,11 +149,11 @@ function buildVariants(variantData: VariantDatum[]): HashMap<string, Variant> {
     const idToChildren = new HashMap<string, Set<string>>();
     variantData.forEach((v) => {
         v.operations.forEach((o) => {
-            if (idToChildren.has(v.id)) {
-                idToChildren.get(v.id)
-                            .add(o.id);
+            if (idToChildren.has(o.id)) {
+                idToChildren.get(o.id)
+                            .add(v.id);
             } else {
-                idToChildren.set(v.id, new Set(o.id))
+                idToChildren.set(o.id, new Set(v.id))
             }
         });
     });
@@ -170,6 +170,8 @@ function buildVariants(variantData: VariantDatum[]): HashMap<string, Variant> {
         const generationNumber: number = variantDatum.generationNumber;
         const testSummary: TestSummary = variantDatum.testSummary;
         const operations: Operation[] = variantDatum.operations;
+        const children: Set<string> =
+            (idToChildren.get(id) === undefined) ? new Set<string>() : idToChildren.get(id);
 
         const parent: Variant = new Variant(id,
                                             generationNumber,
@@ -179,7 +181,7 @@ function buildVariants(variantData: VariantDatum[]): HashMap<string, Variant> {
                                             patch,
                                             operations,
                                             testSummary,
-                                            idToChildren.get(id));
+                                            children);
         idToVariant.set(id, parent);
     });
     return idToVariant;
@@ -264,16 +266,17 @@ function changeSelectVariantParentId(variantData: VariantDatum[]) {
 // 不要なデータを圧縮する
 function compressVariantData(idToVariant: HashMap<string, Variant>, maxGenerationNumber: number): void {
     // 世代 -> ビルドに失敗した個体の数
-    const buildFailedVariantCount: number[] = Array(maxGenerationNumber + 1);
+    const buildFailedVariantOperations: Operation[][] = Array(maxGenerationNumber + 1);
     const compressedVariantIds: Set<string> = new Set<string>();
 
-    buildFailedVariantCount.fill(0);
+    buildFailedVariantOperations.fill([]);
 
     // 圧縮するVariantを探す
     idToVariant.values()
                .forEach((variant) => {
-                   if (!variant.isBuildSuccess()) {
-                       buildFailedVariantCount[variant.getGenerationNumber()]++;
+                   if (!variant.isBuildSuccess() && variant.getChildrenCount() === 0) {
+                       buildFailedVariantOperations[variant.getGenerationNumber()]
+                           = buildFailedVariantOperations[variant.getGenerationNumber()].concat(variant.getOperations());
                        compressedVariantIds.add(variant.getId());
                    }
                });
@@ -284,15 +287,18 @@ function compressVariantData(idToVariant: HashMap<string, Variant>, maxGeneratio
     });
 
     // CompressedVariantを追加する
-    for (let i = 0; i < buildFailedVariantCount.length; i++) {
-        const count = buildFailedVariantCount[i];
-        if (count === 0) {
+    for (let i = 0; i < buildFailedVariantOperations.length; i++) {
+
+        if (buildFailedVariantOperations[i].length === 0) {
             continue;
         }
         const id: string = sprintf('c-%d', i);
 
-        const compressedVariant = new CompressedVariant(id, i, -1.0, count);
-
+        const compressedVariant =
+            new CompressedVariant(id, i, -1.0,
+                                  buildFailedVariantOperations[i].length,
+                                  buildFailedVariantOperations[i]
+            );
         idToVariant.set(id, compressedVariant);
     }
 }
