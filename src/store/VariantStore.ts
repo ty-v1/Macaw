@@ -120,16 +120,18 @@ const mutations = {
         const jsonData: JSONData = JSON.parse(payload.jsonString);
 
         state.projectName = jsonData.projectName;
-        const variantData: VariantDatum[] = jsonData.variants;
 
         // コピー(選択)の解決をする
-        const idToVariant: HashMap<string, Variant> = resolveCopy(variantData);
+        const variantData: VariantDatum[] = resolveCopy(jsonData.variants);
 
         // 選択されたVariantの子の親IDを書き換える
-        changeSelectVariantParentId(idToVariant);
+        changeSelectVariantParentId(variantData);
 
         // 世代数の最大値を求める
-        const maxGenerationNumber = searchMaxGenerationNumber(idToVariant.values());
+        const maxGenerationNumber = searchMaxGenerationNumber(variantData);
+
+        // jsonデータを元にオブジェクトを作成する
+        const idToVariant = buildVariants(variantData);
 
         // いらない個体を圧縮する
         compressVariantData(idToVariant, maxGenerationNumber);
@@ -142,13 +144,26 @@ const mutations = {
 };
 
 // setVariantが呼び出すサブルーチン
-function resolveCopy(variantData: VariantDatum[]): HashMap<string, Variant> {
-    // コピー(選択)の解決をする
+function buildVariants(variantData: VariantDatum[]): HashMap<string, Variant> {
+    // 子供の数をカウントする
+    const idToChildren = new HashMap<string, Set<string>>();
+    variantData.forEach((v) => {
+        v.operations.forEach((o) => {
+            if (idToChildren.has(v.id)) {
+                idToChildren.get(v.id)
+                            .add(o.id);
+            } else {
+                idToChildren.set(v.id, new Set(o.id))
+            }
+        });
+    });
+
     const idToVariant: HashMap<string, Variant> = new HashMap<string, Variant>();
+
     variantData.forEach((variantDatum) => {
         const id: string = variantDatum.id;
         const selectionCount: number = (id === "0") ?
-            variantDatum.selectionCount + 1 : variantDatum.selectionCount
+            variantDatum.selectionCount + 1 : variantDatum.selectionCount;
         const patch: Diff[] = variantDatum.patch;
         const fitness: number = variantDatum.fitness;
         const buildSuccess: boolean = variantDatum.isBuildSuccess;
@@ -156,7 +171,6 @@ function resolveCopy(variantData: VariantDatum[]): HashMap<string, Variant> {
         const testSummary: TestSummary = variantDatum.testSummary;
         const operations: Operation[] = variantDatum.operations;
 
-        // 親のVariantを追加する
         const parent: Variant = new Variant(id,
                                             generationNumber,
                                             fitness,
@@ -164,8 +178,27 @@ function resolveCopy(variantData: VariantDatum[]): HashMap<string, Variant> {
                                             selectionCount,
                                             patch,
                                             operations,
-                                            testSummary);
+                                            testSummary,
+                                            idToChildren.get(id));
         idToVariant.set(id, parent);
+    });
+    return idToVariant;
+}
+
+function resolveCopy(rawData: VariantDatum[]): VariantDatum[] {
+    const variantData: VariantDatum[] = [];
+
+    rawData.forEach((variantDatum) => {
+        variantData.push(variantDatum);
+
+        const id: string = variantDatum.id;
+        const selectionCount: number = (id === "0") ?
+            variantDatum.selectionCount + 1 : variantDatum.selectionCount;
+        const patch: Diff[] = variantDatum.patch;
+        const fitness: number = variantDatum.fitness;
+        const buildSuccess: boolean = variantDatum.isBuildSuccess;
+        const generationNumber: number = variantDatum.generationNumber;
+        const testSummary: TestSummary = variantDatum.testSummary;
 
         for (let i = 1; i <= selectionCount; i++) {
             const selectedVariantId: string = sprintf('%s-%d', id, i);
@@ -173,26 +206,28 @@ function resolveCopy(variantData: VariantDatum[]): HashMap<string, Variant> {
                 id: (i == 1) ? id : sprintf('%s-%d', id, i - 1),
                 operationName: 'select'
             }];
-            const variant: Variant = new Variant(selectedVariantId,
-                                                 generationNumber + i,
-                                                 fitness,
-                                                 buildSuccess,
-                                                 selectionCount,
-                                                 patch,
-                                                 operations,
-                                                 testSummary,
-                                                 true);
-            idToVariant.set(selectedVariantId, variant);
+            variantData.push(
+                {
+                    id: selectedVariantId,
+                    generationNumber: generationNumber + i,
+                    fitness: fitness,
+                    selectionCount: selectionCount - i,
+                    isBuildSuccess: buildSuccess,
+                    testSummary: testSummary,
+                    patch: patch,
+                    operations: operations
+                }
+            );
         }
     });
-    return idToVariant;
+    return variantData;
 }
 
-function searchMaxGenerationNumber(variants: Variant[]): number {
-    const size = variants.length;
+function searchMaxGenerationNumber(variantData: VariantDatum[]): number {
+    const size = variantData.length;
     let max = 0;
     for (let i = 0; i < size; i++) {
-        const generationNumber = variants[i].getGenerationNumber();
+        const generationNumber = variantData[i].generationNumber;
         if (max < generationNumber) {
             max = generationNumber;
         }
@@ -200,31 +235,30 @@ function searchMaxGenerationNumber(variants: Variant[]): number {
     return max;
 }
 
-function changeSelectVariantParentId(idToVariant: HashMap<string, Variant>) {
+function changeSelectVariantParentId(variantData: VariantDatum[]) {
+    const idToGenerationNumber: HashMap<string, number> = new HashMap<string, number>();
 
-    idToVariant.values()
-               .forEach((variant) => {
+    variantData.forEach((e) => {
+        idToGenerationNumber.set(e.id, e.generationNumber);
+    });
 
-                   if (variant.isSelected()) {
-                       return;
-                   }
+    variantData.forEach((variantDatum) => {
+        if (variantDatum.operations.length === 1
+            && variantDatum.operations[0].operationName === 'select') {
+            return;
+        }
+        const childGenerationNumber = variantDatum.generationNumber;
 
-                   const childGenerationNumber = variant.getGenerationNumber();
+        variantDatum.operations.forEach((operation) => {
+            const parentGenerationNumber = idToGenerationNumber.get(operation.id);
 
-                   variant.getParentIds()
-                          .forEach((oldParentId) => {
-                              const parentGenerationNumber =
-                                  idToVariant.get(oldParentId)
-                                             .getGenerationNumber();
-                              const generationSub = childGenerationNumber - parentGenerationNumber;
-                              if (generationSub === 1) {
-                                  return;
-                              }
-                              const newParentId: string =
-                                  sprintf('%s-%d', oldParentId, generationSub - 1);
-                              variant.changeParentId(oldParentId, newParentId);
-                          });
-               });
+            const generationSub = childGenerationNumber - parentGenerationNumber;
+            if (generationSub === 1) {
+                return;
+            }
+            operation.id = sprintf('%s-%d', operation.id, generationSub - 1);
+        });
+    });
 }
 
 // 不要なデータを圧縮する
@@ -261,7 +295,6 @@ function compressVariantData(idToVariant: HashMap<string, Variant>, maxGeneratio
 
         idToVariant.set(id, compressedVariant);
     }
-
 }
 
 const actions = {};
