@@ -64,8 +64,12 @@ export class Variant {
         return this.buildSuccess;
     }
 
-    public getChilrenCount(): number {
+    public getChildrenCount(): number {
         return this.children.size;
+    }
+
+    public getOperations(): Operation[] {
+        return this.idToOperations.values();
     }
 
     /**
