@@ -2,6 +2,11 @@
     <div class="wrapper">
         <div class="button">
             <button @click="reset">RESET</button>
+            <label>
+                <input type="checkbox"
+                       v-model="showAllEdges">
+                Show all edges
+            </label>
         </div>
         <div class="content" ref="content">
             <svg :width="width"
@@ -72,7 +77,8 @@
          * */
         private isDragging: boolean = false;
         private onDragEvent: boolean = false;
-        private dragStart: { x: number, y: number } = {x: 0, y: 0}
+        private dragStart: { x: number, y: number } = {x: 0, y: 0};
+        private showAllEdges: boolean = false;
 
         private unwatch: () => void = () => {
         };
@@ -93,13 +99,29 @@
         }
 
         get simpleLine(): GraphEdge[] {
-            const filter = (edge: GraphEdge) => edge.getPattern() !== 'double-line';
+            const filter = (edge: GraphEdge) => {
+                if (!this.showAllEdges) {
+                    return edge.getPattern() !== 'double-line'
+                        && !edge.getTargetId()
+                                .startsWith('c');
+                } else {
+                    return edge.getPattern() !== 'double-line';
+                }
+            };
 
             return this.$store.getters['LayoutStore/filteredEdges'](filter);
         }
 
         get doubleLine(): GraphEdge[] {
-            const filter = (edge: GraphEdge) => edge.getPattern() === 'double-line';
+            const filter = (edge: GraphEdge) => {
+                if (!this.showAllEdges) {
+                    return edge.getPattern() === 'double-line'
+                        && !edge.getTargetId()
+                                .startsWith('c');
+                } else {
+                    return edge.getPattern() === 'double-line';
+                }
+            };
 
             return this.$store.getters['LayoutStore/filteredEdges'](filter);
         }
