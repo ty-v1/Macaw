@@ -1,6 +1,6 @@
 import {Diff} from "@/scripts/data/Diff";
 import {Operation} from "@/scripts/data/Operation";
-import {TestSummary} from "@/scripts/data/TestSummary";
+import {TestSummaryData} from "@/scripts/data/TestSummaryData";
 import HashMap from "hashmap";
 import {MessageBuilder, MessageData} from "@/scripts/data/MessageData";
 import {sprintf} from "sprintf-js";
@@ -14,12 +14,12 @@ export class Variant {
     private readonly selectionCount: number;
     private readonly patch: Diff[];
     private readonly idToOperations: HashMap<string, Operation>;
-    private readonly testSummary: TestSummary;
+    private readonly testSummary: TestSummaryData;
     private readonly children: Set<string>;
 
     public constructor(id: string, generationNumber: number, fitness: number, buildSuccess: boolean,
                        selectionCount: number, patch: Diff[], operations: Operation[],
-                       testSummary: TestSummary, children: Set<string>) {
+                       testSummary: TestSummaryData, children: Set<string>) {
         this.id = id;
         this.generationNumber = generationNumber;
         this.fitness = fitness;
@@ -70,6 +70,10 @@ export class Variant {
 
     public getOperations(): Operation[] {
         return this.idToOperations.values();
+    }
+
+    public getTestSummary(): TestSummaryData {
+        return this.testSummary;
     }
 
     /**

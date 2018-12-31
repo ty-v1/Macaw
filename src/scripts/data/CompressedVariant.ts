@@ -1,5 +1,5 @@
 import {Variant} from "./Variant";
-import {TestSummary} from "./TestSummary";
+import {TestSummaryData} from "./TestSummaryData";
 import {MessageBuilder, MessageData} from "@/scripts/data/MessageData";
 import {Operation} from "@/scripts/data/Operation";
 
@@ -9,7 +9,7 @@ export class CompressedVariant extends Variant {
 
     public constructor(id: string, generationNumber: number, fitness: number, count: number,
                        operations: Operation[]) {
-        const testSummary: TestSummary = {
+        const testSummary: TestSummaryData = {
             successRate: 0.0,
             executedTestsCount: 0,
             testResults: []

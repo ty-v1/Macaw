@@ -3,7 +3,7 @@ import {Variant} from "@/scripts/data/Variant";
 import {JSONData} from "@/scripts/data/JSONData";
 import {VariantDatum} from "@/scripts/data/VariantDatum";
 import {Diff} from "@/scripts/data/Diff";
-import {TestSummary} from "@/scripts/data/TestSummary";
+import {TestSummaryData} from "@/scripts/data/TestSummaryData";
 import {Operation} from "@/scripts/data/Operation";
 import {sprintf} from "sprintf-js";
 import {Statistics} from "@/scripts/data/Statistics";
@@ -168,7 +168,7 @@ function buildVariants(variantData: VariantDatum[]): HashMap<string, Variant> {
         const fitness: number = variantDatum.fitness;
         const buildSuccess: boolean = variantDatum.isBuildSuccess;
         const generationNumber: number = variantDatum.generationNumber;
-        const testSummary: TestSummary = variantDatum.testSummary;
+        const testSummary: TestSummaryData = variantDatum.testSummary;
         const operations: Operation[] = variantDatum.operations;
         const children: Set<string> =
             (idToChildren.get(id) === undefined) ? new Set<string>() : idToChildren.get(id);
@@ -200,7 +200,7 @@ function resolveCopy(rawData: VariantDatum[]): VariantDatum[] {
         const fitness: number = variantDatum.fitness;
         const buildSuccess: boolean = variantDatum.isBuildSuccess;
         const generationNumber: number = variantDatum.generationNumber;
-        const testSummary: TestSummary = variantDatum.testSummary;
+        const testSummary: TestSummaryData = variantDatum.testSummary;
 
         for (let i = 1; i <= selectionCount; i++) {
             const selectedVariantId: string = sprintf('%s-%d', id, i);
