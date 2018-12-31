@@ -1,6 +1,6 @@
 import {Operation} from "@/scripts/data/Operation";
 import {Diff} from "@/scripts/data/Diff";
-import {TestSummary} from "@/scripts/data/TestSummary";
+import {TestSummaryData} from "@/scripts/data/TestSummaryData";
 
 export type VariantDatum = {
     id: string,
@@ -8,7 +8,7 @@ export type VariantDatum = {
     fitness: number,
     selectionCount: number,
     isBuildSuccess: boolean,
-    testSummary: TestSummary,
+    testSummary: TestSummaryData,
     patch: Diff[],
     operations: Operation[]
 }
