@@ -14,6 +14,7 @@
     "diff2html": "^2.5.0",
     "hashmap": "^2.3.0",
     "json-object-mapper": "^1.6.0",
+    "reflect-metadata": "^0.1.12",
     "sprintf-js": "^1.1.1",
     "vue": "^2.5.17",
     "vue-chartjs": "^3.4.0",
