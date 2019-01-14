@@ -5,17 +5,26 @@
               :x2="targetX"
               :y2="targetY"
               fill="none"
-              :class="edge.getCSSClasses()">
+              :class="classes"
+              :style="!edge.isDisplay? 'display:none' : ''">
         </line>
     </g>
 </template>
 
 <script lang="ts">
-    import {Component} from 'vue-property-decorator';
+    import {Component, Prop} from 'vue-property-decorator';
     import EdgeComponentBase from "../../../scripts/network/edge/EdgeComponentBase";
 
     @Component
     export default class SimpleLine extends EdgeComponentBase {
+        @Prop(String) pattern!: string;
+
+        public get classes(): string[] {
+            const classes: string[] = [];
+            classes.push(this.pattern);
+            classes.push(...this.edge.classes);
+            return classes;
+        }
     }
 </script>
 

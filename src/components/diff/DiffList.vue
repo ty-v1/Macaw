@@ -1,10 +1,10 @@
 <template>
     <div class="diff-list-wrapper" v-if="variantId !== ''">
         <button @click="onClick">Close</button>
-        <div>
-            <p>Generation Number : {{getGenerationNumber}}</p>
-            <p>Fitness : {{getFitness}}</p>
-        </div>
+        <!--<div>-->
+            <!--<p>Generation Number : {{getGenerationNumber}}</p>-->
+            <!--<p>Fitness : {{getFitness}}</p>-->
+        <!--</div>-->
         <div v-html="prettyHtml"></div>
     </div>
 </template>
@@ -16,7 +16,7 @@
     export default {
         props: {
             variantId: {
-                type: String,
+                type: Number,
                 required: true
             }
         },
@@ -35,7 +35,12 @@
             },
             getDiffs: function () {
                 const variant = this.$store.getters['VariantStore/variant'](this.variantId);
-                const patch = variant.getPatches();
+                const patch = variant.patch;
+
+                if (patch === undefined) {
+                    return '';
+                }
+
                 const size = patch.length;
 
                 let diff = '';

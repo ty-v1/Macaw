@@ -28,8 +28,8 @@
         })
     export default class VariantInformation extends Vue {
         get isShow(): boolean {
-            const variantId: string = this.$store.getters['DiffStore/variantId'];
-            return variantId !== '' && variantId !== '0';
+            const variantId: number = this.$store.getters['DiffStore/variantId'];
+            return variantId > 0;
         }
     }
 </script>

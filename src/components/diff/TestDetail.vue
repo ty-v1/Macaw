@@ -29,13 +29,13 @@
     import {Component, Prop, Vue} from "vue-property-decorator";
     import SomeTests from "./SomeTests.vue";
     import AllTests from "./AllTests.vue";
-    import {TestSummaryData} from "../../scripts/data/TestSummaryData";
+    import {TestSummary2} from "../../scripts/json/TestSummary2";
 
     @Component({
                    components: {AllTests, SomeTests}
                })
     export default class TestDetail extends Vue {
-        @Prop() testSummary!: TestSummaryData;
+        @Prop() testSummary!: TestSummary2;
 
         /**
          * data

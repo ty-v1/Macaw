@@ -1,9 +1,9 @@
 export interface DiffStoreState {
-    variantId: string,
+    variantId: number,
 }
 
 const state: DiffStoreState = {
-    variantId: ''
+    variantId: -1
 };
 
 const getters = {
@@ -13,7 +13,7 @@ const getters = {
 const mutations = {
     setVariantId: (state, payload) => state.variantId = payload.variantId,
     reset: state => {
-        state.variantId = '';
+        state.variantId = -1;
     }
 };
 

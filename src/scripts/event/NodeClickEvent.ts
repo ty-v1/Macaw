@@ -1,5 +1,6 @@
 export type NodeClickEvent = {
     id: string,
+    variantId: number,
     // 左ボタン=0, 中央ボタン=1, 右ボタン=2。
     buttons: number
 }

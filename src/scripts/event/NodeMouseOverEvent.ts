@@ -1,3 +1,5 @@
+import {Message} from "@/store/VariantPopupStore";
+
 export type NodeMouseOverEvent = {
     id: string,
     nodeX: number,
@@ -5,5 +7,6 @@ export type NodeMouseOverEvent = {
     nodeWidth: number,
     nodeHeight: number,
     pageX: number,
-    pageY: number
+    pageY: number,
+    message: Message
 }

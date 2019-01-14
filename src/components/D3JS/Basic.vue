@@ -18,30 +18,15 @@
                  @mouseup="stopDrag"
                  @mousemove="onDrag">
                 <g transform="translate(20, 20)">
-                    <SimpleLine v-for="edge in simpleLine"
-                                :key="edge.id"
-                                :edge="edge">
-                    </SimpleLine>
+                    <GNode v-for="node in nodes"
+                           :key="node.id"
+                           :node="node">
+                    </GNode>
 
-                    <DoubleLine v-for="edge in doubleLine"
-                                :key="edge.id"
-                                :edge="edge">
-                    </DoubleLine>
-
-                    <CircleNode v-for="node in circleNode"
-                                :key="node.id"
-                                :node="node"
-                                @node-mouse-over="onNodeMouseOver"
-                                @node-mouse-out="onNodeMouseOut"
-                                @node-click="onNodeClick">
-                    </CircleNode>
-
-                    <CrossNode v-for="node in crossNode"
-                               :key="node.id"
-                               :node="node"
-                               @node-mouse-over="onNodeMouseOver"
-                               @node-mouse-out="onNodeMouseOut">
-                    </CrossNode>
+                    <GEdge v-for="edge in edges"
+                           :key="edge.id"
+                           :edge="edge">
+                    </GEdge>
                 </g>
             </svg>
             <Popup></Popup>
@@ -50,26 +35,22 @@
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+    import {Component, Vue, Watch} from 'vue-property-decorator';
     import {Color} from "../../scripts/color/Color";
-    import {GraphEdge} from "../../scripts/data/network/GraphEdge";
-    import {GraphNode} from "../../scripts/data/network/GraphNode";
     import SimpleLine from "./edge/SimpleLine.vue";
     import CrossNode from "./node/CrossNode.vue";
     import CircleNode from "./node/CircleNode.vue";
-    import {ThreeBasePointsGradation} from "../../scripts/network/node/strategy/color/ThreeBasePointsGradation";
-    import {NoAlignHierarchy} from "../../scripts/network/node/strategy/position/NoAlignHierarchy";
-    import {FixedNodeSize} from "../../scripts/network/node/strategy/size/FixedNodeSize";
-    import {FitnessBasedNodeShape} from "../../scripts/network/node/strategy/shape/FitnessBasedNodeShape";
-    import {Variant} from "../../scripts/data/Variant";
+    import {ThreeBasePointsGradation} from "../../n2/node/strategy/color/ThreeBasePointsGradation";
+    import {NoAlignHierarchy} from "../../n2/node/strategy/position/NoAlignHierarchy";
     import Popup from "../Popup.vue";
-    import {NodeMouseOverEvent} from "../../scripts/event/NodeMouseOverEvent";
-    import {NodeClickEvent} from "../../scripts/event/NodeClickEvent";
     import DoubleLine from "./edge/DoubleLine.vue";
     import {ViewBox} from "../../store/LayoutStore";
     import {sprintf} from "sprintf-js";
+    import {EdgeDatum3, NodeDatum2, NodeDatum3, Tyukan} from "../../scripts/json/Variant2";
+    import GNode from "./node/GNode.vue";
+    import GEdge from "./edge/GEdge.vue";
 
-    @Component({components: {DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
+    @Component({components: {GEdge, GNode, DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
 
         /**
@@ -78,7 +59,7 @@
         private isDragging: boolean = false;
         private onDragEvent: boolean = false;
         private dragStart: { x: number, y: number } = {x: 0, y: 0};
-        private showAllEdges: boolean = false;
+        private showAllEdges: boolean = true;
 
         private unwatch: () => void = () => {
         };
@@ -86,44 +67,13 @@
         /**
          *  computed
          *  */
-        get circleNode(): GraphNode[] {
-            const filter = (node: GraphNode) => node.getShape() === 'circle';
-
-            return this.$store.getters['LayoutStore/filteredNodes'](filter);
+        get nodes(): NodeDatum3[] {
+            return this.$store.getters['LayoutStore/allNodes'];
         }
 
-        get crossNode(): GraphNode[] {
-            const filter = (node: GraphNode) => node.getShape() === 'cross';
-
-            return this.$store.getters['LayoutStore/filteredNodes'](filter);
-        }
-
-        get simpleLine(): GraphEdge[] {
-            const filter = (edge: GraphEdge) => {
-                if (!this.showAllEdges) {
-                    return edge.getPattern() !== 'double-line'
-                        && !edge.getTargetId()
-                                .startsWith('c');
-                } else {
-                    return edge.getPattern() !== 'double-line';
-                }
-            };
-
-            return this.$store.getters['LayoutStore/filteredEdges'](filter);
-        }
-
-        get doubleLine(): GraphEdge[] {
-            const filter = (edge: GraphEdge) => {
-                if (!this.showAllEdges) {
-                    return edge.getPattern() === 'double-line'
-                        && !edge.getTargetId()
-                                .startsWith('c');
-                } else {
-                    return edge.getPattern() === 'double-line';
-                }
-            };
-
-            return this.$store.getters['LayoutStore/filteredEdges'](filter);
+        get edges(): EdgeDatum3[] {
+            console.log(this.$store.getters['LayoutStore/allEdges']);
+            return this.$store.getters['LayoutStore/allEdges'];
         }
 
         get width() {
@@ -161,44 +111,6 @@
         /**
          * custom event handler
          * */
-        onNodeMouseOver(event: NodeMouseOverEvent) {
-            const variant: Variant = this.$store.getters['VariantStore/variant'](event.id);
-
-            this.$store.commit('VariantPopupStore/initializeData',
-                               {
-                                   variant: variant,
-                                   x: event.pageX,
-                                   y: event.pageY - 20,
-                                   width: 100,
-                                   height: 100,
-                               });
-        }
-
-        onNodeMouseOut() {
-            this.$store.commit('VariantPopupStore/dismiss');
-        }
-
-        onNodeClick(event: NodeClickEvent) {
-            const variantId: string = this.$store.getters['DiffStore/variantId'];
-
-            // 経路のハイライトを解除する
-            this.$store.commit('LayoutStore/clearNodeClass', {});
-            this.$store.commit('LayoutStore/clearEdgeClass', {});
-
-            if (variantId !== '' && event.id === variantId) {
-                this.$store.commit('DiffStore/reset', {});
-
-            } else {
-                this.$store.commit('DiffStore/setVariantId', {
-                    variantId: event.id
-                });
-                // 経路をハイライトする
-                this.$store.commit('LayoutStore/highlightAncestryTree', {
-                    id: event.id
-                });
-            }
-        }
-
         onClick(event: MouseEvent) {
             this.$store.commit('DiffStore/reset', {});
             this.$store.commit('LayoutStore/clearNodeClass', {});
@@ -286,10 +198,12 @@
                 state => state.VariantStore.idToVariant,
                 () => this.apply());
 
-            const midCalculator = (variants: Variant[]) => {
-                for (let i = 0; i < variants.length; i++) {
-                    if (variants[i].getId() === "0") {
-                        return variants[i].getFitness();
+            const midCalculator = (variants: Tyukan) => {
+                const a: NodeDatum2[] = variants.hiassyukus();
+
+                for (let i = 0; i < a.length; i++) {
+                    if (a[i].variant.id === 0) {
+                        return a[i].variant.fitness;
                     }
                 }
                 return 0.5;
@@ -306,12 +220,6 @@
 
             this.$store.commit('LayoutStore/setNodePositionStrategy',
                                {nodePositionStrategy: new NoAlignHierarchy()});
-
-            this.$store.commit('LayoutStore/setNodeSizeStrategy',
-                               {nodeSizeStrategy: new FixedNodeSize(15, 15)});
-
-            this.$store.commit('LayoutStore/setNodeShapeStrategy',
-                               {nodeShapeStrategy: new FitnessBasedNodeShape()});
         }
 
         mounted() {
@@ -323,16 +231,23 @@
             this.unwatch();
         }
 
+        /**
+         * watcher
+         * */
+        @Watch('showAllEdges')
+        onValueChange(newValue: boolean): void {
+            console.log(`watch: ${newValue}`);
+            if(newValue){
+                this.$store.commit('LayoutStore/showAllEdges');
+            }else{
+                this.$store.commit('LayoutStore/dismissCrossEdges');
+            }
+        }
+
         apply() {
-            const variants: Variant[] = this.$store.getters['VariantStore/variants'];
-            const maxGenerationNumber: number
-                = this.$store.getters['VariantStore/maxGenerationNumber'];
-            const generationNumberToVariantCount: number[] =
-                this.$store.getters['VariantStore/generationNumberToVariantCount'];
+            const variants: Tyukan = this.$store.getters['VariantStore/tyukan'];
             this.$store.commit('LayoutStore/apply', {
                 variants: variants,
-                maxGenerationNumber: maxGenerationNumber,
-                generationNumberToVariantCount: generationNumberToVariantCount,
                 content: {
                     width: this.contentWidth,
                     height: this.contentHeight

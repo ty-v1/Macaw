@@ -1,16 +1,16 @@
 <template>
     <div v-if="isShow" class="popup" :style="style">
-        <div v-if="messageData.hasTop()">
-            {{messageData.getTop()}}
+        <div>
+            {{message.title}}
         </div>
         <ul>
-            <li v-for="messageDatum in messageData.getData()">
+            <li v-for="item in message.items">
                 <span>
-                    {{ messageDatum.itemName}}
+                    {{ item.name}}
                 </span>
                 :
                 <span>
-                    {{ messageDatum.description}}
+                    {{ item.value}}
                 </span>
             </li>
         </ul>
@@ -20,7 +20,7 @@
 <script lang="ts">
     import {Component, Vue} from "vue-property-decorator";
     import {sprintf} from "sprintf-js";
-    import {MessageData} from "../scripts/data/MessageData";
+    import {Message} from "../store/VariantPopupStore";
 
     @Component
     export default class Popup extends Vue {
@@ -55,8 +55,8 @@
             }
         }
 
-        get messageData(): MessageData {
-            return this.$store.getters['VariantPopupStore/messageData'];
+        get message(): Message {
+            return this.$store.getters['VariantPopupStore/message'];
         }
     }
 </script>

@@ -28,10 +28,12 @@
 
     import {Component, Prop, Vue} from "vue-property-decorator";
     import {TestSummaryData} from "../../scripts/data/TestSummaryData";
+    import {TestSummary2} from "../../scripts/json/TestSummary2";
+    import {sprintf} from "sprintf-js";
 
     @Component
     export default class TestSummary extends Vue {
-        @Prop() testSummary!: TestSummaryData;
+        @Prop() testSummary!: TestSummary2;
 
         /**
          * getters
@@ -64,8 +66,8 @@
             return count;
         }
 
-        get percent(): number {
-            return this.testSummary.successRate;
+        get percent(): string {
+            return sprintf('%.1f', this.testSummary.successRate * 100);
         }
     }
 </script>

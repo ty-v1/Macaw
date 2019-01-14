@@ -5,7 +5,8 @@
               :x2="targetX - 2"
               :y2="targetY"
               fill="none"
-              :class="{highlighted : edge.highlighted}">
+              :class="{highlighted : edge.highlighted}"
+              :style="!edge.isDisplay? 'display:none' : ''">
         </line>
 
         <line :x1="sourceX + 2"
@@ -13,7 +14,8 @@
               :x2="targetX + 2"
               :y2="targetY"
               fill="none"
-              :class="{highlighted : edge.highlighted}">
+              :class="{highlighted : edge.highlighted}"
+              :style="!edge.isDisplay? 'display:none' : ''">
         </line>
     </g>
 </template>

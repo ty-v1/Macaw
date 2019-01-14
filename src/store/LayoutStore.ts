@@ -1,13 +1,7 @@
-import {GraphNode} from "@/scripts/data/network/GraphNode";
-import {Layout} from "@/scripts/data/network/Layout";
-import {LayoutFactory} from "@/scripts/network/layout/LayoutFactory";
-import {DefaultNodeColor} from "@/scripts/network/node/strategy/color/DefaultNodeColor";
-import {DefaultNodePosition} from "@/scripts/network/node/strategy/position/DefaultNodePosition";
-import {DefaultNodeSize} from "@/scripts/network/node/strategy/size/DefaultNodeSize";
-import {DefaultNodeShape} from "@/scripts/network/node/strategy/shape/DefaultNodeShape";
-import {GraphNodeSet} from "@/scripts/data/network/GraphNodeSet";
-import {GraphEdgeSet} from "@/scripts/data/network/GraphEdgeSet";
-import {GraphEdge} from "@/scripts/data/network/GraphEdge";
+import {LayoutStrategies} from "@/n2/layout/LayoutStrategies";
+import {DefaultNodeColorStrategy} from "@/n2/node/strategy/color/DefaultNodeColorStrategy";
+import {DefaultNodePositionStrategy} from "@/n2/node/strategy/position/DefaultNodePositionStrategy";
+import {EdgeDatum3, GraphEdgeSet2, GraphNodeSet2, Layout2, NodeDatum3} from "@/scripts/json/Variant2";
 
 export type ViewBox = {
     minX: number,
@@ -22,18 +16,16 @@ type Size = {
 }
 
 export interface LayoutStoreState {
-    layoutStrategy: LayoutFactory,
-    layout: Layout | null,
+    layoutStrategy: LayoutStrategies,
+    layout: Layout2 | null,
     viewBox: ViewBox,
     size: Size
 }
 
 const state: LayoutStoreState = {
-    layoutStrategy: new LayoutFactory(
-        new DefaultNodeColor(),
-        new DefaultNodePosition(),
-        new DefaultNodeSize(),
-        new DefaultNodeShape()
+    layoutStrategy: new LayoutStrategies(
+        new DefaultNodeColorStrategy(),
+        new DefaultNodePositionStrategy(),
     ),
     layout: null,
     viewBox: {
@@ -53,14 +45,6 @@ const getters = {
 
     allEdges: state => (state.layout !== null) ? state.layout.edges.values() : [],
 
-    filteredNodes: state =>
-        (filter: (node: GraphNode) => boolean) =>
-            (state.layout !== null) ? state.layout.nodes.filter(filter) : [],
-
-    filteredEdges: state =>
-        (filter: (edge: GraphEdge) => boolean) =>
-            (state.layout !== null) ? state.layout.edges.filter(filter) : [],
-
     svgHeight: state => (state.layout !== null) ? state.layout.height : 0,
 
     svgWidth: state => (state.layout !== null) ? state.layout.width : 0,
@@ -75,19 +59,9 @@ const mutations = {
     setNodePositionStrategy: (state, payload) =>
         state.layoutStrategy.setNodePositionStrategy(payload.nodePositionStrategy),
 
-    setNodeSizeStrategy: (state, payload) =>
-        state.layoutStrategy.setNodeSizeStrategy(payload.nodeSizeStrategy),
-
-    setNodeShapeStrategy: (state, payload) =>
-        state.layoutStrategy.setNodeShapeStrategy(payload.nodeShapeStrategy),
-
     apply: (state, payload) => {
         state.layout = state.layoutStrategy
-                            .exec(payload.variants,
-                                  payload.maxGenerationNumber,
-                                  payload.generationNumberToVariantCount,
-                                  30,
-                                  20);
+                            .exec(payload.variants, 30, 20);
 
         // 初期状態は全体が収まるように設定
         const svgWidth: number = state.layout.width + 40;
@@ -181,29 +155,25 @@ const mutations = {
     highlightAncestryTree: (state, payload) => {
         const id: string = payload.id;
 
-        const nodes: GraphNodeSet = state.layout.nodes;
-        const edges: GraphEdgeSet = state.layout.edges;
+        const nodes: GraphNodeSet2 = state.layout.nodes;
+        const edges: GraphEdgeSet2 = state.layout.edges;
 
         if (!nodes.has(id)) {
             return;
         }
 
-        const node: GraphNode = nodes.get(id);
+        const node: NodeDatum3 = nodes.get(id);
         // 選択したノードをハイライトする
-        node.addCSSClass('selected');
+        node.classes.push('selected');
 
         // 再帰的に経路をハイライトする
         // 祖先
-        node.getInEdgeIds()
-            .forEach((edgeId) => {
-                highlightAncestor(edgeId, nodes, edges);
-            });
+        node.inEdgeIds
+            .forEach((edgeId) => highlightAncestor(edgeId, nodes, edges));
         // highlightAncestor(, nodes, edges);
         // 子孫
-        node.getOutEdgeIds()
-            .forEach((edgeId) => {
-                highlightDescendant(edgeId, nodes, edges);
-            });
+        node.outEdgeIds
+            .forEach((edgeId) => highlightDescendant(edgeId, nodes, edges));
 
         // highlightDescendant(id, nodes, edges);
     },
@@ -211,52 +181,69 @@ const mutations = {
     clearNodeClass: (state, payload) => {
 
         state.layout.nodes.values()
-             .forEach((node) => {
-                 node.clearCSSClasses();
-             });
+             .forEach((n) => n.classes = []);
     },
 
     clearEdgeClass: (state, payload) => {
         state.layout.edges.values()
-             .forEach((edge) => {
-                 edge.clearCSSClasses();
+             .forEach((e) => e.classes = []);
+    },
+
+    showAllEdges: (state) => {
+        const edges: GraphEdgeSet2 = state.layout.edges;
+        edges.values()
+             .forEach((e) => e.isDisplay = true);
+    },
+
+    dismissCrossEdges: (state) => {
+        const nodes: GraphNodeSet2 = state.layout.nodes;
+        const edges: GraphEdgeSet2 = state.layout.edges;
+        const inEdges: EdgeDatum3[] = [];
+
+        nodes.values()
+             .forEach((n) => {
+                 if (n.shape !== 'cross') {
+                     return;
+                 }
+                 n.inEdgeIds.forEach((e) => inEdges.push(edges.get(e)));
              });
+
+        inEdges.forEach((e) => e.isDisplay = false);
     }
 };
 
-function highlightAncestor(id: string, nodes: GraphNodeSet, edges: GraphEdgeSet) {
+function highlightAncestor(id: string, nodes: GraphNodeSet2, edges: GraphEdgeSet2) {
     if (nodes.has(id)) {
         const node = nodes.get(id);
-        node.addCSSClass('highlight');
+        node.classes.push('highlight');
 
         // 祖先に繋がる辺をハイライトする
-        node.getInEdgeIds()
-            .forEach((inEdgeId) => {
-                highlightAncestor(inEdgeId, nodes, edges);
-            });
+        node.inEdgeIds
+            .forEach((inEdgeId) => highlightAncestor(inEdgeId, nodes, edges));
+
     } else if (edges.has(id)) {
         const edge = edges.get(id);
-        edge.addCSSClass('highlight');
+        edge.classes.push('highlight');
 
-        highlightAncestor(edge.getSourceId(), nodes, edges);
+        highlightAncestor(edge.sourceId, nodes, edges);
     }
 }
 
-function highlightDescendant(id: string, nodes: GraphNodeSet, edges: GraphEdgeSet) {
+function highlightDescendant(id: string, nodes: GraphNodeSet2, edges: GraphEdgeSet2) {
     if (nodes.has(id)) {
         const node = nodes.get(id);
-        node.addCSSClass('highlight');
+        node.classes.push('highlight');
 
         // 子孫に繋がる辺をハイライトする
-        node.getOutEdgeIds()
+        node.outEdgeIds
             .forEach((outEdgeId) => {
                 highlightDescendant(outEdgeId, nodes, edges);
             });
     } else if (edges.has(id)) {
         const edge = edges.get(id);
-        edge.addCSSClass('highlight');
+        edge.classes.push('highlight');
 
-        highlightDescendant(edge.getTargetId(), nodes, edges);
+        highlightDescendant(edge.targetId, nodes, edges);
     }
 }
 

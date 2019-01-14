@@ -10,19 +10,19 @@
     import {Component, Prop, Vue} from "vue-property-decorator";
     import TestDetail from "./TestDetail.vue";
     import TestSummary from "./TestSummary.vue";
-    import {TestSummaryData} from "../../scripts/data/TestSummaryData";
-    import {Variant} from "../../scripts/data/Variant";
+    import {Variant2} from "../../scripts/json/Variant2";
+    import {TestSummary2} from "../../scripts/json/TestSummary2";
 
     @Component({
                    components: {TestSummary, TestDetail}
                })
     export default class TestGroup extends Vue {
-        @Prop(String) variantId!: string;
+        @Prop(Number) variantId!: number;
 
-        get testSummary(): TestSummaryData {
-            const variant: Variant = this.$store.getters['VariantStore/variant'](this.variantId);
+        get testSummary(): TestSummary2 {
+            const variant: Variant2 = this.$store.getters['VariantStore/variant'](this.variantId);
 
-            return variant.getTestSummary();
+            return variant.testSummary;
         }
     }
 </script>
