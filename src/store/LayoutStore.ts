@@ -1,7 +1,9 @@
 import {LayoutStrategies} from "@/n2/layout/LayoutStrategies";
 import {DefaultNodeColorStrategy} from "@/n2/node/strategy/color/DefaultNodeColorStrategy";
 import {DefaultNodePositionStrategy} from "@/n2/node/strategy/position/DefaultNodePositionStrategy";
-import {EdgeDatum3, GraphEdgeSet2, GraphNodeSet2, Layout2, NodeDatum3} from "@/scripts/json/Variant2";
+import {EdgeDatum3, Layout2, NodeDatum3} from "@/scripts/json/Layout";
+import {GraphNodeSet2} from "@/scripts/json/GraphNodeSet2";
+import {GraphEdgeSet2} from "@/scripts/json/GraphEdgeSet2";
 
 export type ViewBox = {
     minX: number,
@@ -86,33 +88,16 @@ const mutations = {
         };
     },
 
-    reset: (state,
-            payload: {
-                content: {
-                    width: number,
-                    height: number
-                }
-            }) => {
+    reset: (state) => {
         // 初期状態は全体が収まるように設定
         const svgWidth: number = state.layout.width + 40;
         const svgHeight: number = state.layout.height + 40;
 
-        const contentWidth = payload.content.width;
-        const contentHeight = payload.content.height;
-
-        // 縦横のいずれかが小さいときはcontentに収まるようにviewBoxの値を変える
-        let ratio: number = 1;
-        if (contentWidth < svgWidth || contentHeight < svgHeight) {
-            const widthRatio = svgWidth / contentWidth;
-            const heightRation = svgHeight / contentHeight;
-            ratio = Math.max(widthRatio, heightRation);
-        }
-
         state.viewBox = {
             minX: 0,
             minY: 0,
-            width: svgWidth * ratio,
-            height: svgHeight * ratio
+            width: svgWidth,
+            height: svgHeight
         };
     },
 

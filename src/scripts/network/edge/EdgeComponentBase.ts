@@ -1,7 +1,7 @@
 import Component from "vue-class-component";
 import Vue from "vue";
 import {Prop} from "vue-property-decorator";
-import {EdgeDatum3} from "@/scripts/json/Variant2";
+import {EdgeDatum3} from "@/scripts/json/Layout";
 
 @Component
 export default class EdgeComponentBase extends Vue {

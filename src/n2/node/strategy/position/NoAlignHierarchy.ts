@@ -1,5 +1,6 @@
 import {INodePositionStrategy} from "@/n2/node/strategy/position/INodePositionStrategy";
-import {GraphNodeSet2, Tyukan} from "@/scripts/json/Variant2";
+import {GraphNodeSet2} from "@/scripts/json/GraphNodeSet2";
+import {Tyukan} from "@/scripts/json/Tyukan";
 
 export class NoAlignHierarchy implements INodePositionStrategy {
 
@@ -25,7 +26,7 @@ export class NoAlignHierarchy implements INodePositionStrategy {
         };
 
         // 集約していないノードの座標を先に計算する
-        variants.hiassyukus()
+        variants.hiassyukus(true)
                 .forEach(keisan);
 
         // 集約したノードの座標を計算する

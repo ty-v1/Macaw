@@ -1,7 +1,10 @@
 import {INodeColorStrategy} from "@/n2/node/strategy/color/INodeColorStrategy";
 import {INodePositionStrategy} from "@/n2/node/strategy/position/INodePositionStrategy";
-import {EdgeDatum3, GraphEdgeSet2, GraphNodeSet2, Layout2, Tyukan} from "@/scripts/json/Variant2";
 import {sprintf} from "sprintf-js";
+import {Tyukan} from "@/scripts/json/Tyukan";
+import {EdgeDatum3, Layout2} from "@/scripts/json/Layout";
+import {GraphNodeSet2} from "@/scripts/json/GraphNodeSet2";
+import {GraphEdgeSet2} from "@/scripts/json/GraphEdgeSet2";
 
 export class LayoutStrategies {
 

@@ -16,9 +16,9 @@
     import {Component, Prop, Vue} from "vue-property-decorator";
     import CircleNode from "./CircleNode.vue";
     import CrossNode from "./CrossNode.vue";
-    import {NodeDatum3} from "../../../scripts/json/Variant2";
     import {NodeClickEvent} from "../../../scripts/event/NodeClickEvent";
     import {NodeMouseOverEvent} from "../../../scripts/event/NodeMouseOverEvent";
+    import {NodeDatum3} from "../../../scripts/json/Layout";
 
     @Component({
                    components: {CrossNode, CircleNode}

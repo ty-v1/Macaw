@@ -28,6 +28,14 @@
                            :edge="edge">
                     </GEdge>
                 </g>
+
+                <text v-if="maxGeneration > 1"
+                      v-for="generation in maxGeneration"
+                      x="0"
+                      :y="40 + (15 + 100)*(generation-1)"
+                      class="label">
+                    {{generation - 1}}
+                </text>
             </svg>
             <Popup></Popup>
         </div>
@@ -46,9 +54,11 @@
     import DoubleLine from "./edge/DoubleLine.vue";
     import {ViewBox} from "../../store/LayoutStore";
     import {sprintf} from "sprintf-js";
-    import {EdgeDatum3, NodeDatum2, NodeDatum3, Tyukan} from "../../scripts/json/Variant2";
     import GNode from "./node/GNode.vue";
     import GEdge from "./edge/GEdge.vue";
+    import {EdgeDatum3, NodeDatum3} from "../../scripts/json/Layout";
+    import {Tyukan} from "../../scripts/json/Tyukan";
+    import {NodeDatum2} from "../../scripts/json/NodeDatum2";
 
     @Component({components: {GEdge, GNode, DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
@@ -58,6 +68,7 @@
          * */
         private isDragging: boolean = false;
         private onDragEvent: boolean = false;
+        private isMove: boolean = false;
         private dragStart: { x: number, y: number } = {x: 0, y: 0};
         private showAllEdges: boolean = true;
 
@@ -72,7 +83,6 @@
         }
 
         get edges(): EdgeDatum3[] {
-            console.log(this.$store.getters['LayoutStore/allEdges']);
             return this.$store.getters['LayoutStore/allEdges'];
         }
 
@@ -108,10 +118,20 @@
                            viewBox.minX, viewBox.minY, viewBox.width, viewBox.height);
         }
 
+        get maxGeneration(): number {
+            const t: Tyukan = this.$store.getters['VariantStore/tyukan'];
+
+            return t.maxGeneration + 1;
+        }
+
         /**
          * custom event handler
          * */
         onClick(event: MouseEvent) {
+            if (this.isMove) {
+                return;
+            }
+
             this.$store.commit('DiffStore/reset', {});
             this.$store.commit('LayoutStore/clearNodeClass', {});
             this.$store.commit('LayoutStore/clearEdgeClass', {});
@@ -133,6 +153,7 @@
         }
 
         startDrag(e: MouseEvent) {
+            this.isMove = false;
             this.isDragging = true;
             this.dragStart.x = e.pageX;
             this.dragStart.y = e.pageY;
@@ -147,6 +168,7 @@
                 return;
             }
 
+            this.isMove = true;
             // 感度が高すぎるためイベントを間引く
             this.onDragEvent = true;
             setTimeout(async () => {
@@ -162,12 +184,7 @@
         }
 
         reset() {
-            this.$store.commit('LayoutStore/reset', {
-                content: {
-                    width: this.contentWidth,
-                    height: this.contentHeight
-                }
-            });
+            this.$store.commit('LayoutStore/reset');
         }
 
         private get contentWidth(): number {
@@ -236,10 +253,9 @@
          * */
         @Watch('showAllEdges')
         onValueChange(newValue: boolean): void {
-            console.log(`watch: ${newValue}`);
-            if(newValue){
+            if (newValue) {
                 this.$store.commit('LayoutStore/showAllEdges');
-            }else{
+            } else {
                 this.$store.commit('LayoutStore/dismissCrossEdges');
             }
         }
@@ -297,6 +313,9 @@
         stroke: none;
         fill: #000000;
         font-size: 1px;
+    }
 
+    .label {
+        font-size: 20px;
     }
 </style>

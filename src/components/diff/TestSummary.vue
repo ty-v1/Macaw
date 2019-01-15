@@ -27,7 +27,6 @@
 <script lang="ts">
 
     import {Component, Prop, Vue} from "vue-property-decorator";
-    import {TestSummaryData} from "../../scripts/data/TestSummaryData";
     import {TestSummary2} from "../../scripts/json/TestSummary2";
     import {sprintf} from "sprintf-js";
 

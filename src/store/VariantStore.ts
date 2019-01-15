@@ -1,24 +1,26 @@
 import HashMap from "hashmap";
-import {Variant} from "@/scripts/data/Variant";
 import {Statistics} from "@/scripts/data/Statistics";
 import {APRResult} from "@/scripts/json/APRResult";
-import {Tyukan, Variant2} from "@/scripts/json/Variant2";
+import {Variant2} from "@/scripts/json/Variant2";
+import {Tyukan} from "@/scripts/json/Tyukan";
+import {APRConfiguration} from "@/scripts/json/APRConfiguration";
 
 export interface VariantStoreState {
     idToVariant: HashMap<number, Variant2>,
     tyukan: Tyukan,
-    projectName: string
+    projectName: string,
+    config: APRConfiguration | undefined,
 }
 
 const state: VariantStoreState = {
     idToVariant: new HashMap<number, Variant2>(),
     projectName: "",
-    tyukan: new Tyukan([])
+    tyukan: new Tyukan([]),
+    config: undefined
 };
 
 const getters = {
-    variants: state => state.idToVariant.values()
-                            .sort(Variant.compare),
+    variants: state => state.idToVariant.values(),
 
     variant: state => (id: number) => state.idToVariant.get(id),
 
@@ -26,12 +28,14 @@ const getters = {
 
     projectName: state => state.projectName,
 
+    config : state => state.config,
+
     // 各世代ごとのfitnessの統計情報を返す
     // TODO 手直しを入れる
     generationNumberToFitnessStatistics: state => {
-
-        const generationNumberToStatistics: Statistics[] = new Array(state.maxGenerationNumber + 1);
-        for (let i = 0; i <= state.maxGenerationNumber; i++) {
+        const maxGeneration: number = state.tyukan.maxGeneration;
+        const generationNumberToStatistics: Statistics[] = new Array(maxGeneration + 1);
+        for (let i = 0; i <= maxGeneration; i++) {
             generationNumberToStatistics[i] = {
                 max: undefined,
                 min: undefined,
@@ -40,15 +44,15 @@ const getters = {
             };
         }
 
-        state.idToVariant.values()
-             .forEach((variant: Variant) => {
+        state.tyukan.hiassyukus()
+             .forEach((n) => {
 
-                 if (!variant.isBuildSuccess()) {
+                 if (!n.variant.isBuildSuccess) {
                      return;
                  }
 
-                 const generationNumber = variant.getGenerationNumber();
-                 const fitness = variant.getFitness();
+                 const generationNumber = n.generation;
+                 const fitness = n.variant.fitness;
 
                  const statistics = generationNumberToStatistics[generationNumber];
 
@@ -84,12 +88,13 @@ const mutations = {
         const aprResult: APRResult = new APRResult();
         aprResult.deserialize(JSON.parse(payload.jsonString));
 
-        console.log(aprResult);
-
         state.projectName = aprResult.projectName;
 
         const iToV = new HashMap<number, Variant2>();
         aprResult.variants.forEach((v) => iToV.set(v.id, v));
+
+        state.config = aprResult.configuration;
+        console.log(state.config);
         state.idToVariant = iToV;
 
         // 中間データの作成

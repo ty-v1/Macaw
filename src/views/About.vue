@@ -57,7 +57,7 @@
                             xAxes: [{
                                 scaleLabel: {
                                     display: true,
-                                    labelString: 'Generation Number',
+                                    labelString: 'Generation',
                                     fontSize: 18
                                 },
                             }],

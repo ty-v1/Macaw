@@ -1,4 +1,5 @@
-import {GraphNodeSet2, Tyukan} from "@/scripts/json/Variant2";
+import {Tyukan} from "@/scripts/json/Tyukan";
+import {GraphNodeSet2} from "@/scripts/json/GraphNodeSet2";
 
 export interface INodePositionStrategy {
 

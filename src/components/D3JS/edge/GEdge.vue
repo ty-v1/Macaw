@@ -13,7 +13,7 @@
     import {Component, Prop, Vue} from "vue-property-decorator";
     import DoubleLine from "./DoubleLine.vue";
     import SimpleLine from "./SimpleLine.vue";
-    import {EdgeDatum3} from "../../../scripts/json/Variant2";
+    import {EdgeDatum3} from "../../../scripts/json/Layout";
 
     @Component({
                    components: {SimpleLine, DoubleLine}

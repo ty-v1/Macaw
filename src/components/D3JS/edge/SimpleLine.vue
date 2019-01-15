@@ -1,9 +1,9 @@
 <template>
     <g>
-        <line :x1="sourceX"
-              :y1="sourceY"
-              :x2="targetX"
-              :y2="targetY"
+        <line :x1="edge.sourceX"
+              :y1="edge.sourceY"
+              :x2="edge.targetX"
+              :y2="edge.targetY"
               fill="none"
               :class="classes"
               :style="!edge.isDisplay? 'display:none' : ''">
@@ -12,12 +12,14 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop} from 'vue-property-decorator';
+    import {Component, Prop, Vue} from 'vue-property-decorator';
     import EdgeComponentBase from "../../../scripts/network/edge/EdgeComponentBase";
+    import {EdgeDatum3} from "../../../scripts/json/Layout";
 
     @Component
-    export default class SimpleLine extends EdgeComponentBase {
+    export default class SimpleLine extends Vue {
         @Prop(String) pattern!: string;
+        @Prop() edge!: EdgeDatum3;
 
         public get classes(): string[] {
             const classes: string[] = [];

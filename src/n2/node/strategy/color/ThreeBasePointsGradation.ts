@@ -1,6 +1,8 @@
 import {Color} from "@/scripts/color/Color";
-import {GraphNodeSet2, NodeDatum2, Tyukan} from "@/scripts/json/Variant2";
 import {INodeColorStrategy} from "@/n2/node/strategy/color/INodeColorStrategy";
+import {Tyukan} from "@/scripts/json/Tyukan";
+import {GraphNodeSet2} from "@/scripts/json/GraphNodeSet2";
+import {NodeDatum2} from "@/scripts/json/NodeDatum2";
 
 export class ThreeBasePointsGradation implements INodeColorStrategy {
 

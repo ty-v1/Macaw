@@ -1,7 +1,7 @@
 import Vue from "vue";
 import {Component, Prop} from "vue-property-decorator";
 import {sprintf} from "sprintf-js";
-import {NodeDatum3} from "@/scripts/json/Variant2";
+import {NodeDatum3} from "@/scripts/json/Layout";
 
 @Component
 export default class NodeComponentBase extends Vue {

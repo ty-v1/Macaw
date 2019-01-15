@@ -8,6 +8,8 @@
             <router-link to="/">Tree</router-link>
             |
             <router-link to="/about">Line Chart</router-link>
+            |
+            <router-link to="/config">Configuration</router-link>
         </div>
         <div style="height: 90%;">
             <router-view></router-view>
