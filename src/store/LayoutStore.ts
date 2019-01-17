@@ -88,7 +88,7 @@ const mutations = {
         };
     },
 
-    reset: (state) => {
+    reset: (state, payload: { content: { width: number, height: number } }) => {
         // 初期状態は全体が収まるように設定
         const svgWidth: number = state.layout.width + 40;
         const svgHeight: number = state.layout.height + 40;
@@ -96,8 +96,8 @@ const mutations = {
         state.viewBox = {
             minX: 0,
             minY: 0,
-            width: svgWidth,
-            height: svgHeight
+            width: payload.content.width,
+            height: payload.content.height
         };
     },
 

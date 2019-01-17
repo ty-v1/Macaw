@@ -184,7 +184,12 @@
         }
 
         reset() {
-            this.$store.commit('LayoutStore/reset');
+            this.$store.commit('LayoutStore/reset', {
+                content: {
+                    width: this.contentWidth,
+                    height: this.contentHeight
+                }
+            });
         }
 
         private get contentWidth(): number {
@@ -305,6 +310,7 @@
     }
 
     line {
+        vector-effect: non-scaling-stroke;
         stroke: #000000;
         stroke-width: 1;
     }

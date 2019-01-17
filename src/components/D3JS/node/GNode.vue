@@ -10,6 +10,12 @@
                @node-mouse-over="onNodeMouseOver"
                @node-mouse-out="onNodeMouseOut"
     ></CrossNode>
+    <SmallCircle v-else-if="node.shape === 'small'"
+                 :node="node"
+                 @node-mouse-over="onNodeMouseOver"
+                 @node-mouse-out="onNodeMouseOut"
+                 @node-click="onNodeClick"
+    ></SmallCircle>
 </template>
 
 <script lang="ts">
@@ -19,9 +25,10 @@
     import {NodeClickEvent} from "../../../scripts/event/NodeClickEvent";
     import {NodeMouseOverEvent} from "../../../scripts/event/NodeMouseOverEvent";
     import {NodeDatum3} from "../../../scripts/json/Layout";
+    import SmallCircle from "./SmallCircle.vue";
 
     @Component({
-                   components: {CrossNode, CircleNode}
+                   components: {SmallCircle, CrossNode, CircleNode}
                })
     export default class GNode extends Vue {
         @Prop() node!: NodeDatum3;

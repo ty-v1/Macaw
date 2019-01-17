@@ -25,7 +25,7 @@ export class NodeDatum2 {
             width: 0,
             height: 0,
             color: Color.BLACK,
-            shape: 'circle',
+            shape: (this.isSelect)? 'small' : 'circle',
             classes: [],
             inEdgeIds: [],
             outEdgeIds: [],

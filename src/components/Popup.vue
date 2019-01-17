@@ -61,12 +61,19 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
     .popup {
         position: absolute;
         z-index: 1;
         background: aqua;
         width: 250px;
-        height: 80px;
+        height: 100px;
+
+        & div {
+        }
+
+        & ul {
+            margin: 0;
+        }
     }
 </style>
