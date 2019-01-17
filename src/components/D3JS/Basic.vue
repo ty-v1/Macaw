@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div class="wrapper" ref="wrapper">
         <div class="button">
             <button @click="reset">RESET</button>
             <label>
@@ -141,7 +141,7 @@
             e.preventDefault();
             e.stopPropagation();
 
-            const scale = Math.pow(1.01, (e.deltaY < 0) ? 1 : -1);
+            const scale = Math.pow(1.08, (e.deltaY < 0) ? -1 : 1);
 
             this.$store.commit('LayoutStore/zoom', {
                 cursor: {
@@ -184,12 +184,7 @@
         }
 
         reset() {
-            this.$store.commit('LayoutStore/reset', {
-                content: {
-                    width: this.contentWidth,
-                    height: this.contentHeight
-                }
-            });
+                this.$store.commit('LayoutStore/reset');
         }
 
         private get contentWidth(): number {
