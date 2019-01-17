@@ -5,6 +5,7 @@
             Configuration
         </div>
         <ul>
+            <li>Project : {{projectName}}</li>
             <li>Max generation : {{config.maxGeneration}}</li>
             <li>Mutation generating count : {{config.mutationGeneratingCount}}</li>
             <li>Crossover generating count : {{config.crossoverGeneratingCount}}</li>
@@ -15,9 +16,10 @@
 </template>
 
 <script lang="ts">
-    import {Vue} from "vue-property-decorator";
+    import {Component, Vue} from "vue-property-decorator";
     import {APRConfiguration} from "../scripts/json/APRConfiguration";
 
+    @Component
     export default class Config extends Vue {
 
         public get isShow() {
@@ -27,9 +29,18 @@
         public get config(): APRConfiguration {
             return this.$store.getters['VariantStore/config'];
         }
+
+        public get projectName(): string {
+            return this.$store.getters['VariantStore/projectName'];
+        }
     }
 </script>
 
 <style scoped lang="scss">
+    .content {
+        ul {
+            margin: 0;
+        }
+    }
 
 </style>

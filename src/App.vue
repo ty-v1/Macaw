@@ -8,9 +8,8 @@
             <router-link to="/">Tree</router-link>
             |
             <router-link to="/about">Line Chart</router-link>
-            |
-            <router-link to="/config">Configuration</router-link>
         </div>
+        <Config></Config>
         <div style="height: 90%;">
             <router-view></router-view>
         </div>
@@ -20,9 +19,12 @@
 <script lang="ts">
     import {Component} from 'vue-property-decorator';
     import Vue from "vue";
+    import Config from "./components/Config.vue";
 
     // ストアのアクセスだけここにかく
-    @Component
+    @Component({
+                   components: {Config}
+               })
     export default class App extends Vue {
         /**
          * event handlers
@@ -78,7 +80,6 @@
 
     #nav {
         margin: 10px;
-        height: 10%;
         a {
             font-weight: bold;
             color: #2c3e50;
