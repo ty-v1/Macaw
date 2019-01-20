@@ -7,6 +7,7 @@
                        v-model="showAllEdges">
                 Show all edges
             </label>
+            <ZoomPanUI></ZoomPanUI>
         </div>
         <div class="content" ref="content">
             <svg :width="width"
@@ -59,8 +60,9 @@
     import {EdgeDatum3, NodeDatum3} from "../../scripts/json/Layout";
     import {Tyukan} from "../../scripts/json/Tyukan";
     import {NodeDatum2} from "../../scripts/json/NodeDatum2";
+    import ZoomPanUI from "../ZoomPanUI.vue";
 
-    @Component({components: {GEdge, GNode, DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
+    @Component({components: {ZoomPanUI, GEdge, GNode, DoubleLine, Popup, SimpleLine, CrossNode, CircleNode}})
     export default class Basic extends Vue {
 
         /**
@@ -141,14 +143,11 @@
             e.preventDefault();
             e.stopPropagation();
 
-            const scale = Math.pow(1.08, (e.deltaY < 0) ? -1 : 1);
-
-            this.$store.commit('LayoutStore/zoom', {
-                cursor: {
-                    x: e.offsetX,
-                    y: e.offsetY,
-                },
-                scale: scale
+            this.$store.commit('LayoutStore/pan', {
+                offset: {
+                    x: 0,
+                    y: -e.deltaY
+                }
             });
         }
 
@@ -184,7 +183,7 @@
         }
 
         reset() {
-                this.$store.commit('LayoutStore/reset');
+            this.$store.commit('LayoutStore/reset');
         }
 
         private get contentWidth(): number {
@@ -281,7 +280,6 @@
     }
 
     svg {
-        position: relative;
         z-index: 0;
     }
 

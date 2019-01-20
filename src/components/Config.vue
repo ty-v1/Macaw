@@ -2,9 +2,10 @@
     <div class="content"
          v-if="isShow">
         <div>
-            Configuration
+            <div>Configuration</div>
+            <button @click="onClick">{{buttonText}}</button>
         </div>
-        <ul>
+        <ul :class="isOpen ? 'open' : 'close'">
             <li>Project : {{projectName}}</li>
             <li>Max generation : {{config.maxGeneration}}</li>
             <li>Mutation generating count : {{config.mutationGeneratingCount}}</li>
@@ -22,6 +23,12 @@
     @Component
     export default class Config extends Vue {
 
+        public isOpen: boolean = true;
+
+        public get buttonText(): string {
+            return (this.isOpen) ? 'Close' : 'Open';
+        }
+
         public get isShow() {
             return this.$store.getters['VariantStore/config'] !== undefined;
         }
@@ -33,6 +40,10 @@
         public get projectName(): string {
             return this.$store.getters['VariantStore/projectName'];
         }
+
+        public onClick() {
+            this.isOpen = !this.isOpen;
+        }
     }
 </script>
 
@@ -41,6 +52,18 @@
         ul {
             margin: 0;
         }
+
+        div {
+            display: flex;
+        }
+    }
+
+    .open {
+
+    }
+
+    .close {
+        display: none;
     }
 
 </style>

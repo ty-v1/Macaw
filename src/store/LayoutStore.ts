@@ -47,6 +47,8 @@ const getters = {
 
     allEdges: state => (state.layout !== null) ? state.layout.edges.values() : [],
 
+    edge: state => (id: string) => (state.layout !== null) ? state.layout.edges.get(id) : undefined,
+
     svgHeight: state => (state.layout !== null) ? state.layout.height : 0,
 
     svgWidth: state => (state.layout !== null) ? state.layout.width : 0,

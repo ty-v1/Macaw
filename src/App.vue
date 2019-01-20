@@ -20,12 +20,22 @@
     import {Component} from 'vue-property-decorator';
     import Vue from "vue";
     import Config from "./components/Config.vue";
+    import axios from "axios";
 
     // ストアのアクセスだけここにかく
     @Component({
                    components: {Config}
                })
     export default class App extends Vue {
+
+        async mounted() {
+            const res = await axios.get('history.json');
+
+            this.$store.commit('DiffStore/reset', {});
+            this.$store.commit('VariantStore/setVariants',
+                               {jsonString: JSON.stringify(res.data)});
+        }
+
         /**
          * event handlers
          * */
@@ -50,7 +60,6 @@
             // ファイルを読み込んでレイアウトの適応
             if (event.dataTransfer !== null && event.dataTransfer.files[0] !== null) {
                 const file: File = event.dataTransfer.files[0];
-
                 const reader = new FileReader();
                 reader.onload = () => {
                     if (reader.result !== null) {
@@ -61,6 +70,7 @@
                 };
                 reader.readAsText(file);
             }
+
             return false;
         }
     }

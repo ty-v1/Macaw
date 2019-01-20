@@ -64,7 +64,7 @@
 <style scoped lang="scss">
     .popup {
         position: absolute;
-        z-index: 1;
+        z-index: 2;
         background: aqua;
         width: 250px;
         height: 100px;

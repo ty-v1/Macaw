@@ -10,6 +10,7 @@
     "@types/hashmap": "^2.0.29",
     "@types/sprintf-js": "^1.1.1",
     "ajv": "^6.5.5",
+    "axios": "^0.18.0",
     "chart.js": "^2.7.3",
     "diff2html": "^2.5.0",
     "hashmap": "^2.3.0",

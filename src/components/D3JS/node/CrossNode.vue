@@ -18,6 +18,7 @@
     import {NodeMouseOverEvent} from "../../../scripts/event/NodeMouseOverEvent";
     import {sprintf} from "sprintf-js";
     import {Item} from "../../../store/VariantPopupStore";
+    import {EdgeDatum3} from "../../../scripts/json/Layout";
 
     @Component
     export default class CrossNode extends NodeComponentBase {
@@ -33,6 +34,50 @@
             items.push({
                            name: 'count',
                            value: String(this.node.variantIds.length)
+                       });
+
+            const operations: number[] = Array(4);
+            operations.fill(0);
+            this.node.inEdgeIds.forEach((e) => {
+                const edge: EdgeDatum3 = this.$store.getters['LayoutStore/edge'](e);
+
+                switch (edge.operation) {
+                    case 'insert':
+                        operations[0]++;
+                        break;
+                    case 'delete':
+                        operations[1]++;
+                        break;
+                    case 'replace':
+                        operations[2]++;
+                        break;
+                    default:
+                        operations[3]++;
+                        break
+                }
+            });
+
+            items.push({
+                           name: 'insert',
+                           value: String(operations[0])
+                       });
+
+
+            items.push({
+                           name: 'delete',
+                           value: String(operations[1])
+                       });
+
+
+            items.push({
+                           name: 'replace',
+                           value: String(operations[2])
+                       });
+
+
+            items.push({
+                           name: 'crossover',
+                           value: String(operations[3] / 2)
                        });
 
             return {
