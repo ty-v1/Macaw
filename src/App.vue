@@ -28,12 +28,16 @@
                })
     export default class App extends Vue {
 
+
         async mounted() {
             const res = await axios.get('history.json');
 
             this.$store.commit('DiffStore/reset', {});
+
+            console.log('Before Load ' + performance.now());
             this.$store.commit('VariantStore/setVariants',
                                {jsonString: JSON.stringify(res.data)});
+            console.log('After Load ' + performance.now());
         }
 
         /**
@@ -56,6 +60,7 @@
 
         onDrop(event: DragEvent) {
             event.preventDefault();
+            console.log('Before Load ' + performance.now());
 
             // ファイルを読み込んでレイアウトの適応
             if (event.dataTransfer !== null && event.dataTransfer.files[0] !== null) {
@@ -66,6 +71,7 @@
                         this.$store.commit('DiffStore/reset', {});
                         this.$store.commit('VariantStore/setVariants',
                                            {jsonString: reader.result.toString()});
+                        console.log('After Load ' + performance.now());
                     }
                 };
                 reader.readAsText(file);
@@ -77,6 +83,10 @@
 </script>
 
 <style lang="scss">
+    body {
+        overflow: hidden;
+    }
+
     #app {
         position: absolute;
         font-family: 'Avenir', Helvetica, Arial, sans-serif;

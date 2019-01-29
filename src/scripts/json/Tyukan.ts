@@ -31,7 +31,7 @@ export class Tyukan {
                 }
             } else {
                 createNodes(variant)
-                    .forEach((n) => this.nodeData.set(n.id, n));
+                    .forEach((n) => this.nodeData.set(String(n.id), n));
             }
         });
 

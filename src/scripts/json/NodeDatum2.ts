@@ -66,6 +66,11 @@ export class NodeDatum2 {
         this.variant.operation.parentIds.forEach((parentId) => {
 
             const source = nodes.getNode(sprintf('%d', parentId));
+
+            if(source === undefined){
+                return [];
+            }
+
             const sourceId: string =
                 (this.generation - source.variant.generationNumber) === 1 ?
                     String(source.variant.id) :

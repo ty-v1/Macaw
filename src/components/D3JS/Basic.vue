@@ -1,23 +1,19 @@
 <template>
     <div class="wrapper" ref="wrapper">
         <div class="button">
-            <button @click="reset">RESET</button>
             <label>
                 <input type="checkbox"
                        v-model="showAllEdges">
                 Show all edges
             </label>
-            <ZoomPanUI></ZoomPanUI>
         </div>
         <div class="content" ref="content">
+            <ZoomPanUI></ZoomPanUI>
             <svg :width="width"
                  :height="height"
                  :viewBox="viewBox"
                  @click="onClick"
-                 @wheel="onWheel"
-                 @mousedown="startDrag"
-                 @mouseup="stopDrag"
-                 @mousemove="onDrag">
+                 @wheel="onWheel">
                 <g transform="translate(20, 20)">
                     <GNode v-for="node in nodes"
                            :key="node.id"
@@ -68,10 +64,6 @@
         /**
          * data
          * */
-        private isDragging: boolean = false;
-        private onDragEvent: boolean = false;
-        private isMove: boolean = false;
-        private dragStart: { x: number, y: number } = {x: 0, y: 0};
         private showAllEdges: boolean = true;
 
         private unwatch: () => void = () => {
@@ -95,7 +87,7 @@
                 const svgWidth = this.$store.getters['LayoutStore/svgWidth'] + 40;
                 const contentWidth = content.getBoundingClientRect().width;
 
-                return Math.max(svgWidth, contentWidth);
+                return Math.max(contentWidth);
             } else {
                 return this.$store.getters['LayoutStore/svgWidth'] + 40;
             }
@@ -108,7 +100,7 @@
                 const svgHeight = this.$store.getters['LayoutStore/svgHeight'] + 40;
                 const contentHeight = content.getBoundingClientRect().height;
 
-                return Math.max(svgHeight, contentHeight);
+                return contentHeight;
             } else {
                 return this.$store.getters['LayoutStore/svgWidth'] + 40;
             }
@@ -130,10 +122,6 @@
          * custom event handler
          * */
         onClick(event: MouseEvent) {
-            if (this.isMove) {
-                return;
-            }
-
             this.$store.commit('DiffStore/reset', {});
             this.$store.commit('LayoutStore/clearNodeClass', {});
             this.$store.commit('LayoutStore/clearEdgeClass', {});
@@ -143,47 +131,14 @@
             e.preventDefault();
             e.stopPropagation();
 
+            console.log('Wheel Event ' + performance.now());
+
             this.$store.commit('LayoutStore/pan', {
                 offset: {
                     x: 0,
                     y: -e.deltaY
                 }
             });
-        }
-
-        startDrag(e: MouseEvent) {
-            this.isMove = false;
-            this.isDragging = true;
-            this.dragStart.x = e.pageX;
-            this.dragStart.y = e.pageY;
-        }
-
-        stopDrag() {
-            this.isDragging = false;
-        }
-
-        async onDrag(e: MouseEvent) {
-            if (!this.isDragging || this.onDragEvent) {
-                return;
-            }
-
-            this.isMove = true;
-            // 感度が高すぎるためイベントを間引く
-            this.onDragEvent = true;
-            setTimeout(async () => {
-                this.$store.commit('LayoutStore/pan', {
-                    offset: {
-                        x: e.pageX - this.dragStart.x,
-                        y: e.pageY - this.dragStart.y
-                    }
-                });
-
-                this.onDragEvent = false;
-            }, 90);
-        }
-
-        reset() {
-            this.$store.commit('LayoutStore/reset');
         }
 
         private get contentWidth(): number {
@@ -238,8 +193,17 @@
                                {nodePositionStrategy: new NoAlignHierarchy()});
         }
 
+
+        // beforeCreate(){
+        //     console.log('A ' + performance.now());
+        // }
+
         mounted() {
             this.apply();
+        }
+
+        updated(){
+            console.log('Updated ' + performance.now());
         }
 
         beforeDestroy() {
@@ -286,7 +250,8 @@
     .content {
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        /*overflow-y: hidden;*/
+        /*overflow-x: scroll;*/
     }
 </style>
 <style>

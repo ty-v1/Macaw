@@ -21,7 +21,8 @@ export interface LayoutStoreState {
     layoutStrategy: LayoutStrategies,
     layout: Layout2 | null,
     viewBox: ViewBox,
-    size: Size
+    size: Size,
+    scale: number
 }
 
 const state: LayoutStoreState = {
@@ -39,7 +40,8 @@ const state: LayoutStoreState = {
     size: {
         width: 100,
         height: 100
-    }
+    },
+    scale: 1
 };
 
 const getters = {
@@ -53,7 +55,9 @@ const getters = {
 
     svgWidth: state => (state.layout !== null) ? state.layout.width : 0,
 
-    viewBox: state => state.viewBox
+    viewBox: state => state.viewBox,
+
+    scale: state => state.scale
 };
 
 const mutations = {
@@ -85,11 +89,37 @@ const mutations = {
         const svgWidth: number = state.layout.width + 40;
         const svgHeight: number = state.layout.height + 40;
 
+        state.scale = 1;
         state.viewBox = {
             minX: 0,
             minY: 0,
             width: svgWidth,
             height: svgHeight
+        };
+    },
+
+    setScale: (state, payload: { scale: number }) => {
+        const scale: number = payload.scale;
+        state.scale = scale;
+
+        // ズームを行う
+        const width: number = state.layout.width + 40;
+        const height: number = state.layout.height + 40;
+        // 大きさをscale倍する
+        const zoomedWidth = width / scale;
+        const zoomedHeight = height / scale;
+
+        // 中心の座標を計算する
+        const minX: number = state.viewBox.minX;
+        const minY: number = state.viewBox.minY;
+        const centerX = minX + width / 2.0;
+        const centerY = minY + height / 2.0;
+
+        state.viewBox = {
+            minX: minX,
+            minY: minY,
+            width: zoomedWidth,
+            height: zoomedHeight
         };
     },
 
@@ -121,6 +151,7 @@ const mutations = {
           payload: {
               offset: { x: number, y: number }
           }) => {
+        const scale: number = state.scale;
         state.viewBox = {
             minX: state.viewBox.minX - payload.offset.x,
             minY: state.viewBox.minY - payload.offset.y,
