@@ -78,8 +78,8 @@ const mutations = {
         state.viewBox = {
             minX: 0,
             minY: 0,
-            width: svgWidth,
-            height: svgHeight
+            width: payload.content.width,
+            height: payload.content.height
         };
     },
 
@@ -93,8 +93,8 @@ const mutations = {
         state.viewBox = {
             minX: 0,
             minY: 0,
-            width: svgWidth,
-            height: svgHeight
+            width: payload.content.width,
+            height: payload.content.height
         };
     },
 
