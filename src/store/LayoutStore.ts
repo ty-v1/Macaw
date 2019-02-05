@@ -75,11 +75,16 @@ const mutations = {
         const svgWidth: number = state.layout.width + 40;
         const svgHeight: number = state.layout.height + 40;
 
+        state.size = {
+            width: payload.content.width,
+            height: payload.content.height
+        };
+        state.scale = 1;
         state.viewBox = {
             minX: 0,
             minY: 0,
-            width: payload.content.width,
-            height: payload.content.height
+            width: state.size.width,
+            height: state.size.height
         };
     },
 
@@ -93,8 +98,8 @@ const mutations = {
         state.viewBox = {
             minX: 0,
             minY: 0,
-            width: payload.content.width,
-            height: payload.content.height
+            width: state.size.width,
+            height: state.size.height
         };
     },
 
@@ -103,8 +108,8 @@ const mutations = {
         state.scale = scale;
 
         // ズームを行う
-        const width: number = state.layout.width + 40;
-        const height: number = state.layout.height + 40;
+        const width: number = state.size.width;
+        const height: number = state.size.height;
         // 大きさをscale倍する
         const zoomedWidth = width / scale;
         const zoomedHeight = height / scale;

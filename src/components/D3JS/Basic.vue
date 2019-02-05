@@ -232,6 +232,7 @@
                     height: this.contentHeight
                 }
             });
+            this.$store.commit('Layout')
         }
     }
 </script>
