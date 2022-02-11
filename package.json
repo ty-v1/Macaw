@@ -9,7 +9,7 @@
   "dependencies": {
     "@types/hashmap": "^2.0.29",
     "@types/sprintf-js": "^1.1.1",
-    "ajv": "^6.5.5",
+    "ajv": "^6.12.3",
     "diff2html": "^2.5.0",
     "chart.js": "^2.7.3",
     "hashmap": "^2.3.0",
